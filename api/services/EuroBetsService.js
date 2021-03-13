@@ -59,70 +59,7 @@ class EuroBetsService {
             console.log('error login', error)
         }
     }
-    // /**
-    //  * Retorna o html da página de bilhetes
-    //  * @const {string} html - Retorno
-    //  */
-    // async getBets() {
-    //     try {
-    //         const configGetBets = {
-    //             method: 'get',
-    //             withCredentials: true,
-    //             url: 'https://www.eurobetsplus.com/sportsbook/my-bets',
-    //             headers: {
-    //                 cookie: this.#headers['set-cookie']
-    //             }
-    //         };
-
-    //         let html = null;
-    //         await axios(configGetBets)
-    //             .then((response) => {
-    //                 html = response.data
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error);
-    //             });
-
-    //         const path = fs.writeFile(html)
-
-    //         return path;
-
-    //     } catch (error) {
-    //         console.log('error getBets', error)
-    //     }
-
-    // }
-
-    // async getGames() {
-    //     try {
-    //         const configGetBets = {
-    //             method: 'get',
-    //             withCredentials: true,
-    //             url: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
-    //             headers: {
-    //                 cookie: this.#headers['set-cookie']
-    //             }
-    //         };
-
-    //         let html = null;
-    //         await axios(configGetBets)
-    //             .then((response) => {
-    //                 html = response.data
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error);
-    //             });
-
-    //         const path = fs.writeFile(html)
-
-    //         return path;
-
-    //     } catch (error) {
-    //         console.log('error getBets', error)
-    //     }
-
-    // }
-
+   
 
 }
 

@@ -32,8 +32,7 @@ class WebScrapingService {
                             const [dataJogo, horaJogo] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(2)`).text().trim().split(' ')
                             const [valor] = $(item).find(`#heading${i + 1}`).text().trim().split('|')
                             const valorAposta = parseFloat(valor.replace('R$', '').replace(',', '.').trim())
-                            console.log('teste', valorAposta)
-                            bilhetes.push({
+                            const bilhete = {
                                 timeCasa: timeCasa.trim(),
                                 timeVisitante: timeVisitante.trim(),
                                 dataJogo,
@@ -41,7 +40,9 @@ class WebScrapingService {
                                 valorAposta,
                                 data,
                                 hora
-                            })
+                            }
+
+                            bilhetes.push(bilhete)
 
                         }
                     })
@@ -82,12 +83,12 @@ class WebScrapingService {
                                         const idJogo = arrayBilhete[6].trim()
                                         const dataJogo = arrayBilhete[7].trim()
                                         const horaJogo = arrayBilhete[8].trim()
-                                        const [ diaJ, mesJ, anoJ ] = dataJogo.split('/')
-                                        const [ horaJ, minutosJ ] = horaJogo.split(':')
+                                        const [diaJ, mesJ, anoJ] = dataJogo.split('/')
+                                        const [horaJ, minutosJ] = horaJogo.split(':')
 
                                         const bilhete = myBetsOpen.find((x) => $(h).text().trim().includes(x.timeCasa))
-                                        const [ diaB, mesB, anoB ] = bilhete.data.split('/')
-                                        const [ horaB, minutosB ] = bilhete.hora.split(':')
+                                        const [diaB, mesB, anoB] = bilhete.data.split('/')
+                                        const [horaB, minutosB] = bilhete.hora.split(':')
 
                                         console.log(idJogo, dataJogo, horaJogo, bilhete, arrayBilhete)
                                         console.log(differenceInHours(
@@ -131,7 +132,7 @@ class WebScrapingService {
 
             console.log("databet: ", dateBet);
             console.log("data atual: ", currenteData)
-            
+
             return currenteData.getTime() < dateBet.getTime();
         })
 
