@@ -56,6 +56,7 @@ class WebScrapingService {
             return null
         }
     }
+
     async validationGames(myBetsOpen) {
         const bilhetes = []
         try {
@@ -115,6 +116,28 @@ class WebScrapingService {
             console.log('screaping', error);
             return null
         }
+    }
+
+    validateBets(myBets) {
+        console.log("bets: ", myBets);
+        const validatedBets = myBets.filter((bet) => {
+            let hour = bet.horaJogo.substring(0, 5);
+            let date = bet.dataJogo.split("/").reverse().join('-');
+            let dateBet = new Date(`${date} ${hour}`);
+            let currenteData = new Date();
+
+            dateBet = new Date(dateBet.valueOf() - dateBet.getTimezoneOffset() * 60000)
+            currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset() * 60000)
+
+            console.log("databet: ", dateBet);
+            console.log("data atual: ", currenteData)
+            
+            return currenteData.getTime() < dateBet.getTime();
+        })
+
+        console.log("bets validadas: ", validatedBets);
+
+        return validatedBets;
     }
 }
 module.exports = WebScrapingService;

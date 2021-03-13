@@ -10,25 +10,25 @@ class Main {
 
     }
 
-    async execute() {
+    async start() {
         if (dotenv.error) {
             console.debug(error)
         }
 
         
 
-        // const client = await venom.create()
-        // client.onMessage((message) => {
-        //     client
-        //         .sendText(message.from, 'Olá! Teste de robo')
-        //         .then((result) => {
-        //             console.log('Result: ', result); //retorna um objeto de successo
-        //         })
-        //         .catch((erro) => {
-        //             console.error('Erro ao enviar mensagem: ', erro); //return um objeto de erro
-        //         });
+        /* const client = await venom.create()
+        client.onMessage((message) => {
+            client
+                .sendText(message.from, 'Olá! Teste de robo')
+                .then((result) => {
+                    console.log('Result: ', result); //retorna um objeto de successo
+                })
+                .catch((erro) => {
+                    console.error('Erro ao enviar mensagem: ', erro); //return um objeto de erro
+                });
 
-        // });
+        }); */
 
         const { USER, PASS } = dotenv.parsed
 
@@ -38,16 +38,20 @@ class Main {
 
         const webScraping = new WebScrapingService(headers)
 
-        const myBeatsOpen = await webScraping.getScrapBets()
+        const myBetsOpen = await webScraping.getScrapBets()
 
-        const validation = await webScraping.validationGames(myBeatsOpen)
+        const validatedBets = webScraping.validateBets(myBetsOpen);
+
+        
+
+        //const validation = await webScraping.validationGames(myBetsOpen)
         // junior 554797172810
         // nicolas 554796782448
 
 
-        // const message = await this.message(myBeatsOpen)
-        // console.log(message)
-        // await client.sendText('554797172810@c.us', message).then((success) => console.log('mensagem enviada'))
+        /* const message = await this.message(myBeatsOpen)
+        console.log(message)
+        await client.sendText('554797172810@c.us', message).then((success) => console.log('mensagem enviada')) */
 
 
     }
