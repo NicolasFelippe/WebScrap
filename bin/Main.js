@@ -14,15 +14,25 @@ class Main {
         if (dotenv.error) {
             console.debug(error);
         }
-
+        console.log('dir', __dirname)
         const { USER, PASS } = dotenv.parsed;
 
-        const venomBotService = await new VenomBotService().create();
+        // DESCOMENTAR PARA CRIAR O SERVIÇO DO BOT WHATS
+        // const venomBotService = await new VenomBotService().create();
 
         const euroBetsService = new EuroBetsService(USER, PASS);
 
         let validatedBets = null;
-        setInterval(async () => {
+        const headers = await euroBetsService.login();
+
+        const webScraping = new WebScrapingService(headers);
+
+        const myBetsOpen = await webScraping.getScrapBets();
+
+        validatedBets = webScraping.validateBets(myBetsOpen);
+
+        // função para ficar buscando a cada 10minutos e enviar msg
+       /*  setInterval(async () => {
             const headers = await euroBetsService.login();
 
             const webScraping = new WebScrapingService(headers);
@@ -36,7 +46,7 @@ class Main {
                 await venomBotService.sendText('554797172810@c.us', msg).then((success) => console.log('mensagem enviada para Junior'))
                 await venomBotService.sendText('554796782448@c.us', msg).then((success) => console.log('mensagem enviada para Nicolas'))
             }
-        }, 600000)
+        }, 60000) */
 
 
 

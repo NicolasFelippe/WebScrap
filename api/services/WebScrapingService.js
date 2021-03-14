@@ -30,6 +30,8 @@ class WebScrapingService {
                             const [data, hora] = $(item).find(`#collapse${i + 1} > div > div > div:nth-child(1)`).text().split(' ')
                             const [timeCasa, timeVisitante] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim().split('x')
                             const [dataJogo, horaJogo] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(2)`).text().trim().split(' ')
+                            const statusAposta = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(3)`).text().trim()
+                            const [time, pontos] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(4)`).text().trim().split(' ')
                             const [valor] = $(item).find(`#heading${i + 1}`).text().trim().split('|')
                             const valorAposta = parseFloat(valor.replace('R$', '').replace(',', '.').trim())
                             const bilhete = {
@@ -39,15 +41,17 @@ class WebScrapingService {
                                 horaJogo,
                                 valorAposta,
                                 data,
-                                hora
+                                hora,
+                                statusAposta,
+                                pontos: `${time} ${pontos}`
                             }
-
                             bilhetes.push(bilhete)
+                            fs.writeFileModel(bilhete)
 
                         }
                     })
                 }).catch((err) => {
-                    console.log('getScrapBets error ler arquivo html');
+                    console.log('getScrapBets error ler arquivo html', err);
                 })
 
             return bilhetes

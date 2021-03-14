@@ -45,6 +45,7 @@ class EuroBetsService {
             // Faz autenticação no site e carrega os cookie no axios para poder usar nas proximas requisições
             await axios(configAuth)
                 .then((response) => {
+                    console.log('autenticado na eurobets', response)
                     this.#headers = response.headers
                 })
                 .catch((error) => {

@@ -1,10 +1,10 @@
 const fs = require('fs');
+const dotenv = require('dotenv').config()
 
-
-const writeFile = (html) => {
+const writeFile = (html, type) => {
     const date = new Date()
     const dateString = date.getTime()
-    const path = `C:\\temp\\meuarquivo${dateString}.html`
+    const path = `C:\\temp\\${dateString}.${type}`
     fs.writeFile(path, html, function (error) {
 
         if (error) {
@@ -17,6 +17,14 @@ const writeFile = (html) => {
 
     return path
 
+}
+
+const writeFileModel = (data) => {
+    if(dotenv.error){
+        console.log('Erro ao pegar caminho do modelo apostas.json')
+        return
+    }
+    fs.appendFile(dotenv.parsed.PATHMODEL, `${JSON.stringify(data)},\n`, (error) => console.log(error || 'Modelo escrito com sucesso'))
 }
 
 const readFile = async (path) => {
@@ -46,5 +54,6 @@ const removeFile = (path) => {
 module.exports = {
     writeFile,
     readFile,
-    removeFile
+    removeFile,
+    writeFileModel
 }
