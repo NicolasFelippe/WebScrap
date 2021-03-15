@@ -1,7 +1,8 @@
-const rp = require('request-promise')
-const cheerio = require('cheerio')
+const rp = require('request-promise');
+const cheerio = require('cheerio');
 const fs = require('../util/fs');
-const differenceInHours = require('date-fns/differenceInHours')
+const differenceInHours = require('date-fns/differenceInHours');
+const _ = require('lodash');
 
 class WebScrapingService {
     #headers
@@ -137,12 +138,24 @@ class WebScrapingService {
             console.log("databet: ", dateBet);
             console.log("data atual: ", currenteData)
 
-            return currenteData.getTime() < dateBet.getTime();
+            // adicionar 10 minutos após o horário do jogo
+            return currenteData.getTime() < (dateBet.getTime() + 600000);
         })
 
         console.log("bets validadas: ", validatedBets);
 
         return validatedBets;
+    }
+
+    verifyNewBets(validatedBets, bets) {
+        const newBets = validatedBets.filter((validatedBet) => {
+            return !bets.some((bet) => {
+                return _.isEqual(bet, validatedBet);
+            });
+        })
+
+        console.log("bets novas: ", newBets);
+        return newBets;
     }
 }
 module.exports = WebScrapingService;

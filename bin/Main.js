@@ -5,6 +5,7 @@ const VenomBotService = require('../api/services/VenomBotService')
 const message = require('../api/util/template-message');
 
 class Main {
+    #bets = [];
 
     constructor() {
 
@@ -16,6 +17,7 @@ class Main {
         }
         console.log('dir', __dirname)
         const { USER, PASS } = dotenv.parsed;
+
 
         // DESCOMENTAR PARA CRIAR O SERVIÇO DO BOT WHATS
         // const venomBotService = await new VenomBotService().create();
@@ -31,6 +33,8 @@ class Main {
 
         validatedBets = webScraping.validateBets(myBetsOpen);
 
+        const newBets = webScraping.verifyNewBets(validatedBets, this.#bets);
+
         // função para ficar buscando a cada 10minutos e enviar msg
        /*  setInterval(async () => {
             const headers = await euroBetsService.login();
@@ -42,13 +46,13 @@ class Main {
             validatedBets = webScraping.validateBets(myBetsOpen);
 
             if (validatedBets && validatedBets.length > 0) {
-                const msg = await message.templateMessage(validatedBets)
+                const msg = await message.templateMessage(newBets)
                 await venomBotService.sendText('554797172810@c.us', msg).then((success) => console.log('mensagem enviada para Junior'))
                 await venomBotService.sendText('554796782448@c.us', msg).then((success) => console.log('mensagem enviada para Nicolas'))
             }
         }, 60000) */
 
-
+        this.#bets.push(...newBets);
 
     }
 
