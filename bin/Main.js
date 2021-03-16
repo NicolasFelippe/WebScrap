@@ -1,4 +1,3 @@
-process.env.NTBA_FIX_319 = 1;
 const dotenv = require('dotenv').config()
 const EuroBetsService = require('../api/services/EuroBetsService')
 const WebScrapingService = require('../api/services/WebScrapingService')
@@ -19,7 +18,7 @@ class Main {
 
 
         // DESCOMENTAR PARA CRIAR O SERVIÇO DO BOT WHATS
-        const telegramService = new TelegramBot( TOKEN_TELEGRAM, {polling: true} );
+        const telegramService = new TelegramBot(TOKEN_TELEGRAM, {polling: true} );
         // telegramService.on('message', function (msg) {
         //     const chatId = msg.chat.id;
         //     console.log(msg)
@@ -45,7 +44,9 @@ class Main {
 
             if (newBets && newBets.length > 0) {
                 const msg = await message.templateMessage(newBets)
-                telegramService.sendMessage(ID_GRUPO, msg);
+                telegramService.sendMessage(ID_GRUPO, msg)
+                .then((success) => console.log('mensagem enviada ao grupo', success))
+                .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
                 // await venomBotService.sendText('554797172810@c.us', msg).then((success) => console.log('mensagem enviada para Junior'))
                 // await venomBotService.sendText('554796782448@c.us', msg).then((success) => console.log('mensagem enviada para Nicolas'))
             }
