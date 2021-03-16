@@ -1,17 +1,19 @@
 
 
-const templateMessage = async (myBeatsOpen) => {
+const templateMessage = async (myBetsOpen) => {
     try {
         let message = 'Olá! segue apostas feitas:\n\r '
-        message += myBeatsOpen.map((beat, index) => (
+        message += myBetsOpen.map((bet, index) => (
         `Aposta ${index + 1}:
-        Time Casa: ${beat.timeCasa},
-        Time Visitante: ${beat.timeVisitante},
-        Data Jogo: ${beat.dataJogo},
-        Hora Jogo: ${beat.horaJogo},
-        Valor Aposta: ${beat.valorAposta},
-        Data: ${beat.data},
-        Hora: ${beat.hora}
+        Time Casa: ${bet.timeCasa}
+        Time Visitante: ${bet.timeVisitante}
+        Data Jogo: ${bet.dataJogo}
+        Hora Jogo: ${bet.horaJogo}
+        Valor Aposta: ${bet.valorAposta}
+        Data aposta: ${bet.data}
+        Hora aposta: ${bet.hora}
+        APOSTA: ${bet.statusAposta} : ${bet.time}
+        Odd: ${bet.odd}
         \n\r`))
 
         return message

@@ -32,7 +32,9 @@ class WebScrapingService {
                             const [timeCasa, timeVisitante] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim().split('x')
                             const [dataJogo, horaJogo] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(2)`).text().trim().split(' ')
                             const statusAposta = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(3)`).text().trim()
-                            const [time, pontos] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(4)`).text().trim().split(' ')
+                            const timeOdd = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(4)`)                            
+                            const [time] = $(timeOdd).text().trim().split($(timeOdd).find('.odd').text())
+                            const odd = $(timeOdd).find('.odd').text().trim()
                             const [valor] = $(item).find(`#heading${i + 1}`).text().trim().split('|')
                             const valorAposta = parseFloat(valor.replace('R$', '').replace(',', '.').trim())
                             const bilhete = {
@@ -44,10 +46,11 @@ class WebScrapingService {
                                 data,
                                 hora,
                                 statusAposta,
-                                pontos: `${time} ${pontos}`
+                                time,
+                                odd
                             }
                             bilhetes.push(bilhete)
-                            fs.writeFileModel(bilhete)
+                            //fs.writeFileModel(bilhete)
 
                         }
                     })
