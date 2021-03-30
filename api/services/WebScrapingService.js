@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 const fs = require('../util/fs');
 const differenceInHours = require('date-fns/differenceInHours');
 const _ = require('lodash');
+const axios = require('axios');
+const FormData = require('form-data');
 
 class WebScrapingService {
     #headers
@@ -32,7 +34,7 @@ class WebScrapingService {
                             const [timeCasa, timeVisitante] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim().split('x')
                             const [dataJogo, horaJogo] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(2)`).text().trim().split(' ')
                             const statusAposta = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(3)`).text().trim()
-                            const timeOdd = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(4)`)                            
+                            const timeOdd = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(4)`)
                             const [time] = $(timeOdd).text().trim().split($(timeOdd).find('.odd').text())
                             const odd = $(timeOdd).find('.odd').text().trim()
                             const [valor] = $(item).find(`#heading${i + 1}`).text().trim().split('|')
@@ -68,9 +70,11 @@ class WebScrapingService {
 
     async validationGames(myBetsOpen) {
         const bilhetes = []
+        let aposta
         try {
             const options = {
-                uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
+                // uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
+                uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol&data=2021-03-30',
                 headers: {
                     cookie: this.#headers['set-cookie']
                 },
@@ -78,46 +82,84 @@ class WebScrapingService {
                     return cheerio.load(body)
                 }
             }
-            let teste = []
+            console.log('mybets', myBetsOpen)
             await rp(options)
                 .then(($) => {
-                    console.log(myBetsOpen.some((x) => $('#section-principal').find('#matches_table > tbody > tr:nth-child(1) > td:nth-child(2)').text().trim().includes(x.timeCasa)))
+                    console.log(myBetsOpen.some((x) => $('#section-principal')
+                        .find('#matches_table > tbody > tr:nth-child(1) > td:nth-child(2)')
+                        .text().trim().includes(x.timeCasa)))
+
                     $('#section-principal').children().each((index, children) => {
                         $(children).children().each((i, x) => {
                             $(x).children().each((d, table) => {
-                                $(table).find('tbody').children().each((g, h) => {
+                                $(table).find('tbody').children().each(async (g, h) => {
                                     if (myBetsOpen.some((x) => $(h).text().trim().includes(x.timeCasa))) {
-                                        const arrayBilhete = $(h).text().trim().split(' ')
-                                        const idJogo = arrayBilhete[6].trim()
-                                        const dataJogo = arrayBilhete[7].trim()
-                                        const horaJogo = arrayBilhete[8].trim()
-                                        const [diaJ, mesJ, anoJ] = dataJogo.split('/')
-                                        const [horaJ, minutosJ] = horaJogo.split(':')
-
+                                        const idJogo = $(h).text().trim().substring($(h).text().trim().indexOf('ID:')).split(' ')[1]
                                         const bilhete = myBetsOpen.find((x) => $(h).text().trim().includes(x.timeCasa))
-                                        const [diaB, mesB, anoB] = bilhete.data.split('/')
-                                        const [horaB, minutosB] = bilhete.hora.split(':')
+                                        const configGetBet = {
+                                            method: 'get',
+                                            url: `https://www.eurobetsplus.com/api/getOptions/${idJogo}`,
+                                            withCredentials: true,
+                                            headers: {
+                                                cookie: this.#headers['set-cookie']
+                                            }
+                                        };
 
-                                        console.log(idJogo, dataJogo, horaJogo, bilhete, arrayBilhete)
-                                        console.log(differenceInHours(
-                                            new Date(diaJ, mesJ, anoJ, horaJ, minutosJ),
-                                            new Date(diaB, mesB, anoB, horaB, minutosB)
-                                        ))
-                                        let data = new Date();
-                                        console.log(differenceInHours(
-                                            new Date(data.valueOf() - data.getTimezoneOffset() * 60000),
-                                            new Date(diaJ, mesJ, anoJ, horaJ, minutosJ)
-                                        ))
-                                        console.log(new Date(data.valueOf() - data.getTimezoneOffset() * 60000))
+                                        await axios(configGetBet)
+                                            .then((response) => {
+                                                const { markets } = response.data
+                                                aposta = markets[bilhete.statusAposta]
+                                                aposta = aposta[bilhete.time.trim()]
+                                            })
+                                            .catch((error) => {
+                                                console.log('configGetBet error:', error);
+                                            });
+
+                                        console.log('markets', aposta)
+
+                                        const configChoice = {
+                                            method: 'get',
+                                            url: `https://www.eurobetsplus.com/api/addBet?match=${idJogo}&choice=${aposta.id}`,
+                                            withCredentials: true,
+                                            headers: {
+                                                cookie: this.#headers['set-cookie']
+                                            }
+                                        };
+                                        await axios(configChoice)
+                                            .then((response) => {
+                                                console.log('configChoice', response.data)
+                                            })
+                                            .catch((error) => {
+                                                console.log('configChoice error:', error);
+                                            });
+
+                                        const data = new FormData();
+                                        data.append('valor', bilhete.valorAposta.toFixed(2).replace('.', ','));
+
+                                        const configFinish = {
+                                            method: 'POST',
+                                            url: `https://www.eurobetsplus.com/api/finishBet`,
+                                            withCredentials: true,
+                                            headers: {
+                                                cookie: this.#headers['set-cookie'],
+                                                ...data.getHeaders()
+                                            },
+                                            data: data
+                                        };
+                                        await axios(configFinish)
+                                            .then((response) => {
+                                                console.log('configFinish', response.data)
+                                            })
+                                            .catch((error) => {
+                                                console.log('configFinish error:', error);
+                                            });
                                     }
                                 })
                             })
                         })
-
                     })
-                    // console.log(teste)
                 }).catch((err) => {
-                    console.log(err);
+                    console.log('error games', err);
                 })
 
             return bilhetes
@@ -128,7 +170,6 @@ class WebScrapingService {
     }
 
     validateBets(myBets) {
-        console.log("bets: ", myBets);
         const validatedBets = myBets.filter((bet) => {
             let hour = bet.horaJogo.substring(0, 5);
             let date = bet.dataJogo.split("/").reverse().join('-');
@@ -137,9 +178,6 @@ class WebScrapingService {
 
             dateBet = new Date(dateBet.valueOf() - dateBet.getTimezoneOffset() * 60000)
             currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset() * 60000)
-
-            console.log("databet: ", dateBet);
-            console.log("data atual: ", currenteData)
 
             // adicionar 10 minutos após o horário do jogo
             return currenteData.getTime() < (dateBet.getTime() + 600000);
@@ -151,9 +189,12 @@ class WebScrapingService {
     }
 
     verifyNewBets(validatedBets, bets) {
+        console.log(validatedBets, bets)
         const newBets = validatedBets.filter((validatedBet) => {
             return !bets.some((bet) => {
-                return _.isEqual(bet, validatedBet);
+                return bet.timeCasa === validatedBet.timeCasa
+                && bet.timeVisitante === validatedBet.timeVisitante
+                && bet.statusAposta === validatedBet.statusAposta
             });
         })
 

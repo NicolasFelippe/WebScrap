@@ -2,7 +2,7 @@ const dotenv = require('dotenv').config()
 const EuroBetsService = require('../api/services/EuroBetsService')
 const WebScrapingService = require('../api/services/WebScrapingService')
 const message = require('../api/util/template-message');
-const TelegramBot = require( `node-telegram-bot-api` )
+const TelegramBot = require(`node-telegram-bot-api`)
 class Main {
     #bets = [];
 
@@ -16,9 +16,7 @@ class Main {
         }
         const { USER, PASS, TOKEN_TELEGRAM, ID_GRUPO } = dotenv.parsed;
 
-
-        // DESCOMENTAR PARA CRIAR O SERVIÇO DO BOT WHATS
-        const telegramService = new TelegramBot(TOKEN_TELEGRAM, {polling: true} );
+        const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
         // telegramService.on('message', function (msg) {
         //     const chatId = msg.chat.id;
         //     console.log(msg)
@@ -26,10 +24,10 @@ class Main {
         //     telegramService.sendMessage('-578125053', 'Received your message');
         //   });
         const euroBetsService = new EuroBetsService(USER, PASS);
-        
+
         let validatedBets = null;
         let timer = 0;
-      
+
         // função para ficar buscando a cada 1 minuto e enviar msg
         setInterval(async () => {
             const headers = await euroBetsService.login();
@@ -40,9 +38,10 @@ class Main {
 
             validatedBets = webScraping.validateBets(myBetsOpen);
 
-            const newBets = webScraping.verifyNewBets(validatedBets, this.#bets);
+            const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
+            if(Array.isArray(newBets) && newBets.length > 0 ) await webScraping.validationGames(newBets);
 
-            if (newBets && newBets.length > 0) {
+            if (Array.isArray(newBets) && newBets.length > 0) {
                 const msg = await message.templateMessage(newBets)
                 telegramService.sendMessage(ID_GRUPO, msg)
                 .then((success) => console.log('mensagem enviada ao grupo', success))
@@ -52,8 +51,8 @@ class Main {
             }
 
             this.#bets.push(...newBets);
-            timer = 60000;
-        }, 60000)
+            timer = 30000;
+        }, 30000)
 
         //this.#bets.push(...newBets);
 
