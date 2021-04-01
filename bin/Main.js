@@ -14,9 +14,9 @@ class Main {
         if (dotenv.error) {
             console.debug(error);
         }
-        const { USER, PASS, TOKEN_TELEGRAM, ID_GRUPO } = dotenv.parsed;
+        const { USER, PASS, TOKEN_TELEGRAM, ID_GRUPO, MULTIPLYBET } = dotenv.parsed;
 
-        const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
+        //const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
         // telegramService.on('message', function (msg) {
         //     const chatId = msg.chat.id;
         //     console.log(msg)
@@ -25,7 +25,6 @@ class Main {
         //   });
         const euroBetsService = new EuroBetsService(USER, PASS);
 
-        let validatedBets = null;
         let timer = 0;
 
         // função para ficar buscando a cada 1 minuto e enviar msg
@@ -36,28 +35,42 @@ class Main {
 
             const myBetsOpen = await webScraping.getScrapBets();
 
-            validatedBets = webScraping.validateBets(myBetsOpen);
+            const validatedBets = webScraping.validateTimeBets(myBetsOpen);
 
-            const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
-            if(Array.isArray(newBets) && newBets.length > 0 ) await webScraping.validationGames(newBets);
+            if(validatedBets.length > 0){
+                const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
 
-            if (Array.isArray(newBets) && newBets.length > 0) {
-                const msg = await message.templateMessage(newBets)
-                telegramService.sendMessage(ID_GRUPO, msg)
-                .then((success) => console.log('mensagem enviada ao grupo', success))
-                .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
-                // await venomBotService.sendText('554797172810@c.us', msg).then((success) => console.log('mensagem enviada para Junior'))
-                // await venomBotService.sendText('554796782448@c.us', msg).then((success) => console.log('mensagem enviada para Nicolas'))
+                if(Array.isArray(newBets) && newBets.length > 0 ){
+                    const bets = await webScraping.validationGames(newBets);
+
+                    console.log("bets retornadas da validacao: ", bets)
+
+                    bets.forEach(async ({idJogo, openBet}) => {
+                        console.log('bet para apostar: ', openBet)
+                        const market = await euroBetsService.getGameOptions(idJogo, openBet);
+
+                        await euroBetsService.registerBet(market.id, idJogo);
+
+                        await euroBetsService.finishBet(openBet, MULTIPLYBET);
+                    })
+                }
+
+
+                /*if (Array.isArray(newBets) && newBets.length > 0) {
+                    const msg = await message.templateMessage(newBets)
+                    telegramService.sendMessage(ID_GRUPO, msg)
+                    .then((success) => console.log('mensagem enviada ao grupo', success))
+                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
+                    // await venomBotService.sendText('554797172810@c.us', msg).then((success) => console.log('mensagem enviada para Junior'))
+                    // await venomBotService.sendText('554796782448@c.us', msg).then((success) => console.log('mensagem enviada para Nicolas'))
+                }*/
+
+                this.#bets.push(...newBets);
             }
 
-            this.#bets.push(...newBets);
             timer = 30000;
         }, 30000)
-
-        //this.#bets.push(...newBets);
-
     }
-
 }
 
 module.exports = new Main();

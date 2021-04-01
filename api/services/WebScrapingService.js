@@ -1,8 +1,6 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const fs = require('../util/fs');
-const differenceInHours = require('date-fns/differenceInHours');
-const _ = require('lodash');
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -68,13 +66,12 @@ class WebScrapingService {
         }
     }
 
-    async validationGames(myBetsOpen) {
+    async validationGames(myBetsOpen, MULTIPLYBET) {
         const bilhetes = []
         let aposta
         try {
             const options = {
-                // uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
-                uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol&data=2021-03-30',
+                uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
                 headers: {
                     cookie: this.#headers['set-cookie']
                 },
@@ -94,9 +91,13 @@ class WebScrapingService {
                             $(x).children().each((d, table) => {
                                 $(table).find('tbody').children().each(async (g, h) => {
                                     if (myBetsOpen.some((x) => $(h).text().trim().includes(x.timeCasa))) {
+
                                         const idJogo = $(h).text().trim().substring($(h).text().trim().indexOf('ID:')).split(' ')[1]
-                                        const bilhete = myBetsOpen.find((x) => $(h).text().trim().includes(x.timeCasa))
-                                        const configGetBet = {
+                                        const openBet = myBetsOpen.find((x) => $(h).text().trim().includes(x.timeCasa))
+
+                                        bilhetes.push({idJogo, openBet});
+
+                                        /*const configGetBet = {
                                             method: 'get',
                                             url: `https://www.eurobetsplus.com/api/getOptions/${idJogo}`,
                                             withCredentials: true,
@@ -108,8 +109,8 @@ class WebScrapingService {
                                         await axios(configGetBet)
                                             .then((response) => {
                                                 const { markets } = response.data
-                                                aposta = markets[bilhete.statusAposta]
-                                                aposta = aposta[bilhete.time.trim()]
+                                                aposta = markets[openBet.statusAposta]
+                                                aposta = aposta[openBet.time.trim()]
                                             })
                                             .catch((error) => {
                                                 console.log('configGetBet error:', error);
@@ -134,7 +135,7 @@ class WebScrapingService {
                                             });
 
                                         const data = new FormData();
-                                        data.append('valor', bilhete.valorAposta.toFixed(2).replace('.', ','));
+                                        data.append('valor', (Number(openBet.valorAposta) * MULTIPLYBET).toFixed(2).replace('.', ','));
 
                                         const configFinish = {
                                             method: 'POST',
@@ -152,7 +153,7 @@ class WebScrapingService {
                                             })
                                             .catch((error) => {
                                                 console.log('configFinish error:', error);
-                                            });
+                                            });*/
                                     }
                                 })
                             })
@@ -169,7 +170,7 @@ class WebScrapingService {
         }
     }
 
-    validateBets(myBets) {
+    validateTimeBets(myBets) {
         const validatedBets = myBets.filter((bet) => {
             let hour = bet.horaJogo.substring(0, 5);
             let date = bet.dataJogo.split("/").reverse().join('-');
@@ -183,13 +184,12 @@ class WebScrapingService {
             return currenteData.getTime() < (dateBet.getTime() + 600000);
         })
 
-        console.log("bets validadas: ", validatedBets);
+        console.log("bets validadas por tempo: ", validatedBets);
 
         return validatedBets;
     }
 
     verifyNewBets(validatedBets, bets) {
-        console.log(validatedBets, bets)
         const newBets = validatedBets.filter((validatedBet) => {
             return !bets.some((bet) => {
                 return bet.timeCasa === validatedBet.timeCasa

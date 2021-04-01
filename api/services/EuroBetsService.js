@@ -60,8 +60,74 @@ class EuroBetsService {
             console.log('error login', error)
         }
     }
-   
 
+    async getGameOptions(idJogo, bet){
+
+        let market;
+
+        const configGetBet = {
+            method: 'get',
+            url: `https://www.eurobetsplus.com/api/getOptions/${idJogo}`,
+            withCredentials: true,
+            headers: {
+                cookie: this.#headers['set-cookie']
+            }
+        };
+
+        await axios(configGetBet)
+            .then((response) => {
+                const { markets } = response.data
+                market = markets[bet.statusAposta]
+                market = market[bet.time.trim()]
+            })
+            .catch((error) => {
+                console.log('configGetBet error:', error);
+            });
+
+        console.log('markets', market);
+        return market;
+    }
+   
+    async registerBet(marketId, idJogo) {
+        const configChoice = {
+            method: 'get',
+            url: `https://www.eurobetsplus.com/api/addBet?match=${idJogo}&choice=${marketId}`,
+            withCredentials: true,
+            headers: {
+                cookie: this.#headers['set-cookie']
+            }
+        };
+        return await axios(configChoice)
+            .then((response) => {
+                return  console.log('configChoice', response.data)
+            })
+            .catch((error) => {
+                return console.log('configChoice error:', error);
+            });
+    }
+
+    async finishBet(bet, MULTIPLYBET) {
+        const data = new FormData();
+        data.append('valor', (Number(bet.valorAposta) * MULTIPLYBET).toFixed(2).replace('.', ','));
+
+        const configFinish = {
+            method: 'POST',
+            url: `https://www.eurobetsplus.com/api/finishBet`,
+            withCredentials: true,
+            headers: {
+                cookie: this.#headers['set-cookie'],
+                ...data.getHeaders()
+            },
+            data: data
+        };
+        await axios(configFinish)
+            .then((response) => {
+                console.log('aposta feita: ', response.data)
+            })
+            .catch((error) => {
+                console.log('configFinish error:', error);
+            });
+    }
 }
 
 module.exports = EuroBetsService;
