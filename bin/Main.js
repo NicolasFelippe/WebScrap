@@ -2,7 +2,8 @@ const dotenv = require('dotenv').config()
 const EuroBetsService = require('../api/services/EuroBetsService')
 const WebScrapingService = require('../api/services/WebScrapingService')
 const message = require('../api/util/template-message');
-const TelegramBot = require(`node-telegram-bot-api`)
+const TelegramBot = require(`node-telegram-bot-api`);
+const { multiply } = require('lodash');
 class Main {
     #bets = [];
 
@@ -15,6 +16,10 @@ class Main {
             console.debug(error);
         }
         const { USER, PASS, TOKEN_TELEGRAM, ID_GRUPO, MULTIPLYBET } = dotenv.parsed;
+
+        console.log("-----configs-----");
+        console.log("USER: ", USER);
+        console.log("MULTIPLYBET: ", MULTIPLYBET);
 
         //const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
         // telegramService.on('message', function (msg) {
