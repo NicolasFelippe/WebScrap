@@ -3,7 +3,7 @@ const EuroBetsService = require('../api/services/EuroBetsService')
 const WebScrapingService = require('../api/services/WebScrapingService')
 const message = require('../api/util/template-message');
 const TelegramBot = require(`node-telegram-bot-api`);
-const { multiply } = require('lodash');
+const { getRandomNumber } = require('../api/util/util');
 class Main {
     #bets = [];
 
@@ -73,8 +73,8 @@ class Main {
                 this.#bets.push(...newBets);
             }
 
-            timer = 30000;
-        }, 30000)
+            // timer aleatório
+        }, getRandomNumber(5, 15))
     }
 }
 
