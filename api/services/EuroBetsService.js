@@ -1,6 +1,6 @@
 const axios = require('axios');
 const FormData = require('form-data');
-const fs = require('../util/fs')
+const { logger } = require('../util/util')
 /** EuroBetsService faz login na conta eurobets, e pega os bilhetes  */
 class EuroBetsService {
     #user;
@@ -28,6 +28,7 @@ class EuroBetsService {
      */
     async login() {
         try {
+            logger('[INIT] [EuroBetsService] login()')
             const data = new FormData();
             data.append('user', this.#user);
             data.append('pass', this.#pass);
@@ -48,21 +49,21 @@ class EuroBetsService {
                     // console.log('autenticado na eurobets', response)
                     this.#headers = response.headers
                 })
-                .catch((error) => {
-                    console.log(error);
+                .catch((err) => {
+                    logger('[ERROR] [EuroBetsService] login() ConfigAuth Error: ', `Error: ${err}`)
                 });
 
             if (!this.#headers) throw new Error('Headers está nulo')
-
+            logger('[END] [EuroBetsService] login()', `Headers: ${this.#headers}`)
             return this.#headers
 
         } catch (error) {
-            console.log('error login', error)
+            logger('[ERROR] [EuroBetsService] login(): ', `Error: ${error}`)
         }
     }
 
-    async getGameOptions(idJogo, bet){
-
+    async getGameOptions(idJogo, bet) {
+        logger('[INIT] [EuroBetsService] getGameOptions()', `idJogo: ${idJogo}`, `bet: ${bet}`)
         let market;
 
         const configGetBet = {
@@ -81,14 +82,14 @@ class EuroBetsService {
                 market = market[bet.time.trim()]
             })
             .catch((error) => {
-                console.log('configGetBet error:', error);
+                logger('[ERROR] [EuroBetsService] getGameOptions() configGetBet: ', `Error: ${error}`);
             });
-
-        console.log('markets: ', market);
+        logger('[END] [EuroBetsService] getGameOptions()', `market: ${market}`)
         return market;
     }
-   
+
     async registerBet(marketId, idJogo) {
+        logger('[INIT] [EuroBetsService] registerBet()', `marketId: ${marketId}`, `idJogo: ${idJogo}`)
         const configChoice = {
             method: 'get',
             url: `https://www.eurobetsplus.com/api/addBet?match=${idJogo}&choice=${marketId}`,
@@ -99,16 +100,17 @@ class EuroBetsService {
         };
         await axios(configChoice)
             .then((response) => {
-                console.log('configChoice', response.data)
+                logger('[END] [EuroBetsService] registerBet()', `registerBet: ${response.data}`)
             })
             .catch((error) => {
-                console.log('configChoice error:', error);
+                logger('[ERROR] [EuroBetsService] registerBet() configChoice', `Error: ${error}`)
             });
     }
 
-    async finishBet(bet, MULTIPLYBET) {
+    async finishBet(bet, multiplyBet) {
+        logger('[INIT] [EuroBetsService] finishBet()', `bet: ${bet}`, `multiplyBet: ${multiplyBet}`)
         const data = new FormData();
-        data.append('valor', (Number(bet.valorAposta) * MULTIPLYBET).toFixed(2).replace('.', ','));
+        data.append('valor', (Number(bet.valorAposta) * multiplyBet).toFixed(2).replace('.', ','));
 
         const configFinish = {
             method: 'POST',
@@ -122,10 +124,10 @@ class EuroBetsService {
         };
         await axios(configFinish)
             .then((response) => {
-                console.log('aposta feita: ', response.data)
+                logger('[END] [EuroBetsService] finishBet()', `finishBet: ${response.data}`)
             })
             .catch((error) => {
-                console.log('configFinish error:', error);
+                logger('[ERROR] [EuroBetsService] finishBet() configFinish',  `Error: ${error}`)
             });
     }
 }
