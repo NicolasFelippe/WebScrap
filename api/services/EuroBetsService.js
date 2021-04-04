@@ -50,20 +50,20 @@ class EuroBetsService {
                     this.#headers = response.headers
                 })
                 .catch((err) => {
-                    logger('[ERROR] [EuroBetsService] login() ConfigAuth Error: ', `Error: ${err}`)
+                    logger('[ERROR] [EuroBetsService] login() ConfigAuth Error: ', `Error: ${JSON.stringify(err, null, "\t")}`)
                 });
 
             if (!this.#headers) throw new Error('Headers está nulo')
-            logger('[END] [EuroBetsService] login()', `Headers: ${this.#headers}`)
+            logger('[END] [EuroBetsService] login()', `Headers: Autenticado!`)
             return this.#headers
 
         } catch (error) {
-            logger('[ERROR] [EuroBetsService] login(): ', `Error: ${error}`)
+            logger('[ERROR] [EuroBetsService] login(): ', `Error: ${JSON.stringify(error, null, "\t")}`)
         }
     }
 
     async getGameOptions(idJogo, bet) {
-        logger('[INIT] [EuroBetsService] getGameOptions()', `idJogo: ${idJogo}`, `bet: ${bet}`)
+        logger('[INIT] [EuroBetsService] getGameOptions()', `idJogo: ${idJogo}`, `bet: ${JSON.stringify(bet, null, "\t")}`)
         let market;
 
         const configGetBet = {
@@ -82,9 +82,9 @@ class EuroBetsService {
                 market = market[bet.time.trim()]
             })
             .catch((error) => {
-                logger('[ERROR] [EuroBetsService] getGameOptions() configGetBet: ', `Error: ${error}`);
+                logger('[ERROR] [EuroBetsService] getGameOptions() configGetBet: ', `Error: ${JSON.stringify(error, null, "\t")}`);
             });
-        logger('[END] [EuroBetsService] getGameOptions()', `market: ${market}`)
+        logger('[END] [EuroBetsService] getGameOptions()', `market: ${JSON.stringify(market, null, "\t")}`)
         return market;
     }
 
@@ -100,15 +100,15 @@ class EuroBetsService {
         };
         await axios(configChoice)
             .then((response) => {
-                logger('[END] [EuroBetsService] registerBet()', `registerBet: ${response.data}`)
+                logger('[END] [EuroBetsService] registerBet()', `registerBet: ${JSON.stringify(response.data, null, "\t")}`)
             })
             .catch((error) => {
-                logger('[ERROR] [EuroBetsService] registerBet() configChoice', `Error: ${error}`)
+                logger('[ERROR] [EuroBetsService] registerBet() configChoice', `Error: ${JSON.stringify(error, null, "\t")}`)
             });
     }
 
     async finishBet(bet, multiplyBet) {
-        logger('[INIT] [EuroBetsService] finishBet()', `bet: ${bet}`, `multiplyBet: ${multiplyBet}`)
+        logger('[INIT] [EuroBetsService] finishBet()', `bet: ${JSON.stringify(bet, null, "\t")}`, `multiplyBet: ${multiplyBet}`)
         const data = new FormData();
         data.append('valor', (Number(bet.valorAposta) * multiplyBet).toFixed(2).replace('.', ','));
 
@@ -124,10 +124,10 @@ class EuroBetsService {
         };
         await axios(configFinish)
             .then((response) => {
-                logger('[END] [EuroBetsService] finishBet()', `finishBet: ${response.data}`)
+                logger('[END] [EuroBetsService] finishBet()', `finishBet: ${JSON.stringify(response.data, null, "\t")}`)
             })
             .catch((error) => {
-                logger('[ERROR] [EuroBetsService] finishBet() configFinish',  `Error: ${error}`)
+                logger('[ERROR] [EuroBetsService] finishBet() configFinish',  `Error: ${JSON.stringify(error, null, "\t")}`)
             });
     }
 }
