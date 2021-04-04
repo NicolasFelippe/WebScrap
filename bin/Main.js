@@ -46,6 +46,7 @@ class Main {
                 const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
 
                 if(Array.isArray(newBets) && newBets.length > 0 ){
+                    console.log("aposta nova detectada")
                     const bets = await webScraping.validationGames(newBets);
 
                     console.log("bets retornadas da validacao: ", bets)
@@ -74,7 +75,7 @@ class Main {
             }
 
             // timer aleatório
-        }, getRandomNumber(5, 15))
+        }, 15000)
     }
 }
 

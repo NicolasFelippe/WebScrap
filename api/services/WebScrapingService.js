@@ -181,7 +181,7 @@ class WebScrapingService {
             currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset() * 60000)
 
             // adicionar 10 minutos após o horário do jogo
-            return currenteData.getTime() < (dateBet.getTime() + 600000);
+            return currenteData.getTime() < (dateBet.getTime());
         })
 
         console.log("bets validadas por tempo: ", validatedBets);

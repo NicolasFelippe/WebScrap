@@ -84,7 +84,7 @@ class EuroBetsService {
                 console.log('configGetBet error:', error);
             });
 
-        console.log('markets', market);
+        console.log('markets: ', market);
         return market;
     }
    
@@ -97,12 +97,12 @@ class EuroBetsService {
                 cookie: this.#headers['set-cookie']
             }
         };
-        return await axios(configChoice)
+        await axios(configChoice)
             .then((response) => {
-                return  console.log('configChoice', response.data)
+                console.log('configChoice', response.data)
             })
             .catch((error) => {
-                return console.log('configChoice error:', error);
+                console.log('configChoice error:', error);
             });
     }
 
