@@ -2,7 +2,7 @@ const loggerWiston = require('./logger')
 
 const getRandomNumber = (min, max) => {
     const time = (Math.floor(Math.random() * (max - min + 1)) + min) * 1000;
-    console.log(`tempo para da próxima chamada: ${time / 1000} segundos`);
+    logger(`Tempo para a próxima chamada: ${time / 1000} segundos`);
     return time;
 }
 
@@ -14,7 +14,15 @@ const logger = (func, ...params) => {
     loggerWiston.info(msg)
 }
 
+const sleep = (milliseconds) => {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+  }
 module.exports = {
     getRandomNumber,
     logger,
+    sleep
 }
