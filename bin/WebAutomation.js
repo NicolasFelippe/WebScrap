@@ -1,30 +1,22 @@
-
+const dotenv = require('dotenv').config()
+const TelegramBot = require(`node-telegram-bot-api`);
 const EuroBetsService = require('../api/services/EuroBetsService')
 const WebScrapingService = require('../api/services/WebScrapingService')
 const message = require('../api/util/template-message');
 const { getRandomNumber, logger, sleep } = require('../api/util/util');
 class WebAutomation {
     #bets = [];
-    #user
-    #pass
-    #telegramService
-    #groupId
-    #multiplybet
-    constructor(user, pass, telegramService, groupId, multiplybet) {
-        this.#user = user
-        this.#pass = pass
-        this.#telegramService = telegramService
-        this.#groupId = groupId // id do grupo do telegram
-        this.#multiplybet = multiplybet
-    }
+    constructor() { }
 
     async start() {
-        
+        const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET } = dotenv.parsed;
 
-        const euroBetsService = new EuroBetsService(this.#user, this.#pass);
+        // const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
+
+        const euroBetsService = new EuroBetsService(USER, PASS);
 
         while (true) {
-            logger('[INIT] [WebAutomation] start()', `User: ${this.#user}`, `MultiplyBet: ${this.#multiplybet}`)
+            logger('[INIT] [WebAutomation] start()', `User: ${USER}`, `MultiplyBet: ${MULTIPLYBET}`)
             const headers = await euroBetsService.login();
 
             const webScraping = new WebScrapingService(headers);
@@ -41,22 +33,22 @@ class WebAutomation {
                     bets.forEach(async ({ idJogo, openBet }) => {
                         const market = await euroBetsService.getGameOptions(idJogo, openBet);
                         await euroBetsService.registerBet(market.id, idJogo);
-                        await euroBetsService.finishBet(openBet, this.#multiplybet);
+                        await euroBetsService.finishBet(openBet, MULTIPLYBET);
                     })
                 }
 
-                if (Array.isArray(newBets) && newBets.length > 0) {
-                    const msg = await message.templateMessage(newBets)
-                    this.#telegramService.sendMessage(this.#groupId, msg)
-                        .then((success) => logger('[SUCCESS] send message group telegram', `Response: ${success}`))
-                        .catch((err) => logger('[ERROR] send message group telegram', `Error: ${err}`));
-                }
+                // if (Array.isArray(newBets) && newBets.length > 0) {
+                //     const msg = await message.templateMessage(newBets)
+                //     this.#telegramService.sendMessage(GROUP_ID_TELEGRAM, msg)
+                //         .then((success) => logger('[SUCCESS] send message group telegram', `Response: ${success}`))
+                //         .catch((err) => logger('[ERROR] send message group telegram', `Error: ${err}`));
+                // }
 
                 this.#bets.push(...newBets);
             }
             logger('[END] [WebAutomation] start()', `Bets: ${JSON.stringify(this.#bets, null, "\t")}`)
-            
-            sleep(getRandomNumber(3,10));
+
+            sleep(getRandomNumber(2,7));
         }
     }
 }
