@@ -1,5 +1,5 @@
 const winston = require('winston');
-
+const date = new Date()
 const logger = winston.createLogger({
     format: winston.format.combine(
         winston.format.errors({ stack: true }),
@@ -19,7 +19,7 @@ const logger = winston.createLogger({
     ),
     transports: [
         // new winston.transports.File({ filename: 'error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'info.log' }),
+        new winston.transports.File({ filename: `${date.toLocaleDateString().split('/').join('-')}.log` }),
     ],
 });
 

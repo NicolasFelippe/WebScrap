@@ -108,10 +108,10 @@ class EuroBetsService {
     }
 
     async finishBet(bet, multiplyBet) {
-        logger('[INIT] [EuroBetsService] finishBet()', `bet: ${JSON.stringify(bet, null, "\t")}`, `multiplyBet: ${multiplyBet}`)
         const data = new FormData();
-        data.append('valor', (Number(bet.valorAposta) * multiplyBet).toFixed(2).replace('.', ','));
-
+        const value = (Number(bet.valorAposta) * multiplyBet).toFixed(2).replace('.', ',')
+        data.append('valor', value);
+        logger('[INIT] [EuroBetsService] finishBet()', `bet: ${JSON.stringify(bet, null, "\t")}`, `multiplyBet: ${multiplyBet}, valor: ${value}`)
         const configFinish = {
             method: 'POST',
             url: `https://www.eurobetsplus.com/api/finishBet`,

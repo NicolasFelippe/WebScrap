@@ -11,7 +11,7 @@ class WebAutomation {
     async start() {
         const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET } = dotenv.parsed;
 
-        // const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
+        const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
 
         const euroBetsService = new EuroBetsService(USER, PASS);
 
@@ -37,12 +37,12 @@ class WebAutomation {
                     })
                 }
 
-                // if (Array.isArray(newBets) && newBets.length > 0) {
-                //     const msg = await message.templateMessage(newBets)
-                //     this.#telegramService.sendMessage(GROUP_ID_TELEGRAM, msg)
-                //         .then((success) => logger('[SUCCESS] send message group telegram', `Response: ${success}`))
-                //         .catch((err) => logger('[ERROR] send message group telegram', `Error: ${err}`));
-                // }
+                if (Array.isArray(newBets) && newBets.length > 0) {
+                    const msg = await message.templateMessage(newBets)
+                    telegramService.sendMessage(GROUP_ID_TELEGRAM, msg)
+                        .then((success) => logger('[SUCCESS] send message group telegram', `Response: ${success}`))
+                        .catch((err) => logger('[ERROR] send message group telegram', `Error: ${err}`));
+                }
 
                 this.#bets.push(...newBets);
             }
