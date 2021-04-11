@@ -2,7 +2,7 @@ const rp = require('request-promise');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const FormData = require('form-data');
-const { logger } = require('../util/logger');
+const { logger } = require('../util/util');
 class WebScrapingService {
     #headers
     constructor(headers) {
