@@ -16,14 +16,13 @@ class Main {
         if (dotenv.error) {
             console.debug(error);
         }
-        const { USER, PASS, TOKEN_TELEGRAM, ID_GRUPO } = dotenv.parsed;
+        const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET } = dotenv.parsed;
 
         // const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
         
         const euroBetsService = new EuroBetsService(USER, PASS);
 
         let validatedBets = null;
-        let timer = 0;
 
         // função para ficar buscando a cada 1 minuto e enviar msg
         while (true) {
@@ -36,11 +35,11 @@ class Main {
             validatedBets = webScraping.validateBets(myBetsOpen);
 
             const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
-            if(Array.isArray(newBets) && newBets.length > 0 ) await webScraping.validationGames(newBets);
+            if(Array.isArray(newBets) && newBets.length > 0 ) await webScraping.validationGames(newBets, MULTIPLYBET);
 
             // if (Array.isArray(newBets) && newBets.length > 0) {
             //     const msg = await message.templateMessage(newBets)
-            //     telegramService.sendMessage(ID_GRUPO, msg)
+            //     telegramService.sendMessage(GROUP_ID_TELEGRAM, msg)
             //     .then((success) => console.log('mensagem enviada ao grupo', success))
             //     .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
             // }
