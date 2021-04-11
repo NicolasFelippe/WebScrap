@@ -72,8 +72,7 @@ class WebScrapingService {
         let aposta
         try {
             const options = {
-                // uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
-                uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol&data=2021-03-30',
+                uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
                 headers: {
                     cookie: this.#headers['set-cookie']
                 },
