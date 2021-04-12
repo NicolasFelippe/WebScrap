@@ -111,6 +111,22 @@ class WebScrapingService {
                                             });
                                         logger('[END] [WebScrapingService] getOptionsBet', `markets: ${aposta}`)
 
+
+                                        const clearBetsConfig = {
+                                            method: 'get',
+                                            url: 'https://www.eurobets.uk/api/addBet?clear=all',
+                                            withCredentials: true,
+                                            headers : {
+                                                cookie: this.#headers['set-cookie']
+                                            }
+                                        }
+
+                                        await axios(clearBetsConfig).then((response) =>{
+                                            logger('[END] [WebScrapingService] clearBetsConfig', `responseClearBetsConfig: ${response.data == "1" ? 'bets limpas do cupom de aposta' : 'bets não limpas do cupom de aposta'}`)
+                                        }).catch((error) => {
+                                            logger('[ERROR] [WebScrapingService] clearBetsConfig ', `Error: ${error}`)
+                                        })
+
                                         logger('[INIT] [WebScrapingService] configChoice', `idJogo: ${idJogo}`, `bet: ${aposta}`)
                                         const configChoice = {
                                             method: 'get',
