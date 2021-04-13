@@ -9,8 +9,8 @@ const getRandomNumber = (min, max) => {
 const logger = (func, ...params) => {
     const date = new Date()
     const msg = `${func} Data: ${date.toLocaleDateString()} Hora: ${date.toLocaleTimeString()}
-    Parametros=\n ${params.join(', \n\t\t')} \n`  
-
+    Parametros=\n ${JSON.stringify(params.join(', \n\t\t', null, '\t'))} \n`  
+ 
     loggerWiston.info(msg)
 }
 

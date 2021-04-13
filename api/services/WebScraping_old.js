@@ -1,6 +1,7 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const { getOptions, clearAll, addBet, finishBet } = require('./axios')
 const FormData = require('form-data');
 const { logger } = require('../util/util');
 class WebScrapingService {
@@ -70,8 +71,6 @@ class WebScrapingService {
 
     async validationGames(myBetsOpen, multiplyBet) {
         logger('[INIT] [WebScrapingService] validationGames()', `myBetsOpen: ${JSON.stringify(myBetsOpen, null, "\t")}`)
-        const bilhetes = []
-        let aposta
         try {
             const options = {
                 uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
@@ -82,90 +81,31 @@ class WebScrapingService {
                     return cheerio.load(body)
                 }
             }
-            await rp(options)
-                .then(($) => {
-                    myBetsOpen.forEach( bet => {
-                        const match = $(`[data-matchname='${bet.match}']`)[0]
-                        const dataMatch = $(match).attr('data-match');
-                        console.log('dataMatch', dataMatch)
-                        if(dataMatch){
-                            const configGetBet = {
-                                method: 'get',
-                                url: `https://www.eurobetsplus.com/api/getOptions/${dataMatch}`,
-                                withCredentials: true,
-                                headers: {
-                                    cookie: this.#headers['set-cookie']
-                                }
-                            };
-                            logger('[INIT] [WebScrapingService] getOptionsBet', `idJogo: ${dataMatch}`)
-                            axios(configGetBet).then((response) => {
-                                const { markets } = response.data
-                                aposta = markets[bet.statusAposta][bet.time.trim()]
-                                logger('[END] [WebScrapingService] getOptionsBet', `markets: ${aposta}`)
-
-                                const clearBetsConfig = {
-                                    method: 'get',
-                                    url: 'https://www.eurobets.uk/api/addBet?clear=all',
-                                    withCredentials: true,
-                                    headers : {
-                                        cookie: this.#headers['set-cookie']
-                                    }
-                                }
-
-                                axios(clearBetsConfig).then( (response) => {
-                                    logger('[END] [WebScrapingService] clearBetsConfig', `responseClearBetsConfig: ${response.data == "1" ? 'bets limpas do cupom de aposta' : 'bets não limpas do cupom de aposta'}`)
-                                    logger('[INIT] [WebScrapingService] configChoice', `idJogo: ${dataMatch}`, `bet: ${aposta}`)
-
-                                    const configChoice = {
-                                        method: 'get',
-                                        url: `https://www.eurobetsplus.com/api/addBet?match=${idJogo}&choice=${aposta.id}`,
-                                        withCredentials: true,
-                                        headers: {
-                                            cookie: this.#headers['set-cookie']
-                                        }
-                                    };
-                                    axios(configChoice).then( (response) => {
-                                        logger('[END] [WebScrapingService] configChoice', `responseConfigChoice: ${JSON.stringify(response.data, null, "\t")}`)
-                                        
-                                        const value = (Number(bilhete.valorAposta) * 1).toFixed(2).replace('.', ',')
-                                        const data = new FormData();
-                                        data.append('valor', value);
-                                        logger('[INIT] [WebScrapingService] configFinish', `Valor: ${value}`)
-                                        let responseConfigFinish = null
-                                        const configFinish = {
-                                            method: 'POST',
-                                            url: `https://www.eurobetsplus.com/api/finishBet`,
-                                            withCredentials: true,
-                                            headers: {
-                                                cookie: this.#headers['set-cookie'],
-                                                ...data.getHeaders()
-                                            },
-                                            data: data
-                                        };
-                                        axios(configFinish).then((response) => {
-                                            responseConfigFinish = response.data
-                                            logger('[END] [WebScrapingService] configFinish', `responseConfigFinish: ${JSON.stringify(responseConfigFinish, null, "\t")}`)
-                                        }).catch((error) => {
-                                            logger('[ERROR] [WebScrapingService] configFinish', `Error: ${JSON.stringify(error, null, "\t")}`)
-                                        });
-                                    }).catch((error) => {
-                                        logger('[ERROR] [WebScrapingService] configChoice ', `Error: ${JSON.stringify(error, null, "\t")}`)
-                                    });
-                                }).catch((error) => {
-                                    logger('[ERROR] [WebScrapingService] configGetBet ', `Error: ${JSON.stringify(error, null, "\t")}`)
-                                });
-                            }).catch((error) => {
-                                logger('[ERROR] [WebScrapingService] clearBetsConfig ', `Error: ${error}`)
-                            })
-                        }
-                    });
-                }).catch((err) => {
-                    logger('[ERROR] [WebScrapingService] validationGames() READ HTML', `Error: ${JSON.stringify(err, null, "\t")}`)
-                })
+            const $ = await rp(options)
+                .then(($) => $)
+            for (let bet of myBetsOpen) {
+                const match = $(`[data-matchname='${bet.match}']`)[0]
+                const dataMatch = $(match).attr('data-match');
+                console.log('dataMatch', dataMatch)
+                if (dataMatch) {
+                    const { markets } = await getOptions(this.#headers, dataMatch)
+                    const aposta = markets[bet.statusAposta][bet.time.trim()]
+                    console.log('aposta', aposta)
+                    const clear = await clearAll(this.#headers)
+                    console.log('clear', clear)
+                    const betAdded = await addBet(this.#headers, dataMatch, aposta.id)
+                    console.log('betAdded', betAdded)
+                    const value = (Number(bet.valorAposta) * multiplyBet).toFixed(2).replace('.', ',')
+                    const data = new FormData();
+                    data.append('valor', value);
+                    const finishBet2 = await finishBet(this.#headers, data)
+                    console.log('finishBet', finishBet2)
+                }
+            }
         } catch (error) {
             logger('[ERROR] [WebScrapingService] validationGames() ', `Error: ${JSON.stringify(error, null, "\t")}`)
             return null
-        } finally{
+        } finally {
             logger('[END] [WebScrapingService] validationGames()')
         }
 

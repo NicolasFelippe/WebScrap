@@ -19,7 +19,7 @@ class Main {
         const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET } = dotenv.parsed;
 
         // const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
-        
+
         const euroBetsService = new EuroBetsService(USER, PASS);
 
         let validatedBets = null;
@@ -35,7 +35,9 @@ class Main {
             validatedBets = webScraping.validateBets(myBetsOpen);
 
             const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
-            if(Array.isArray(newBets) && newBets.length > 0 ) await webScraping.validationGames(newBets, MULTIPLYBET);
+            if (Array.isArray(newBets) && newBets.length > 0) {
+                await webScraping.validationGames(newBets, MULTIPLYBET);
+            }
 
             // if (Array.isArray(newBets) && newBets.length > 0) {
             //     const msg = await message.templateMessage(newBets)
@@ -45,7 +47,7 @@ class Main {
             // }
 
             this.#bets.push(...newBets);
-            sleep(getRandomNumber(2,7));
+            sleep(getRandomNumber(2, 7));
         }
         //this.#bets.push(...newBets);
     }
