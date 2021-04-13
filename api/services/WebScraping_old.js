@@ -29,6 +29,7 @@ class WebScrapingService {
                         if ($(item).find(`#heading${i + 1} > span`).text().includes('Aberto')) {
                             // pega dt e hora do bilhete
                             const [data, hora] = $(item).find(`#collapse${i + 1} > div > div > div:nth-child(1)`).text().split(' ')
+                            const match = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim().split('x')
                             const [timeCasa, timeVisitante] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim().split('x')
                             const [dataJogo, horaJogo] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(2)`).text().trim().split(' ')
                             const statusAposta = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(3)`).text().trim()
@@ -38,6 +39,7 @@ class WebScrapingService {
                             const [valor] = $(item).find(`#heading${i + 1}`).text().trim().split('|')
                             const valorAposta = parseFloat(valor.replace('R$', '').replace(',', '.').trim())
                             const bilhete = {
+                                match,
                                 timeCasa: timeCasa.trim(),
                                 timeVisitante: timeVisitante.trim(),
                                 dataJogo,
@@ -82,71 +84,50 @@ class WebScrapingService {
             }
             await rp(options)
                 .then(($) => {
-                    $('#section-principal').children().each((index, children) => {
-                        $(children).children().each((i, x) => {
-                            $(x).children().each((d, table) => {
-                                $(table).find('tbody').children().each(async (g, h) => {
-                                    let findBet = myBetsOpen.some((x) => $(h).text().trim().includes(x.timeCasa))
-                                    logger('[FIND BET] [WebScrapingService] ', `Status: ${findBet}`)
-                                    if (findBet) {
-                                        const idJogo = $(h).text().trim().substring($(h).text().trim().indexOf('ID:')).split(' ')[1]
-                                        const bilhete = myBetsOpen.find((x) => $(h).text().trim().includes(x.timeCasa))
-                                        const configGetBet = {
-                                            method: 'get',
-                                            url: `https://www.eurobetsplus.com/api/getOptions/${idJogo}`,
-                                            withCredentials: true,
-                                            headers: {
-                                                cookie: this.#headers['set-cookie']
-                                            }
-                                        };
-                                        logger('[INIT] [WebScrapingService] getOptionsBet', `idJogo: ${idJogo}`)
-                                        await axios(configGetBet)
-                                            .then((response) => {
-                                                const { markets } = response.data
-                                                aposta = markets[bilhete.statusAposta]
-                                                aposta = aposta[bilhete.time.trim()]
-                                            })
-                                            .catch((error) => {
-                                                logger('[ERROR] [WebScrapingService] configGetBet ', `Error: ${JSON.stringify(error, null, "\t")}`)
-                                            });
-                                        logger('[END] [WebScrapingService] getOptionsBet', `markets: ${aposta}`)
+                    myBetsOpen.forEach(bet => {
+                        const match = $(`[data-matchname='${bet.match}']`)[0]
+                        const dataMatch = $(match).attr('data-match');
 
+                        if(dataMatch){
+                            const configGetBet = {
+                                method: 'get',
+                                url: `https://www.eurobetsplus.com/api/getOptions/${dataMatch}`,
+                                withCredentials: true,
+                                headers: {
+                                    cookie: this.#headers['set-cookie']
+                                }
+                            };
+                            logger('[INIT] [WebScrapingService] getOptionsBet', `idJogo: ${dataMatch}`)
+                            await axios(configGetBet).then((response) => {
+                                const { markets } = response.data
+                                aposta = markets[bet.statusAposta][bet.time.trim()]
+                                logger('[END] [WebScrapingService] getOptionsBet', `markets: ${aposta}`)
 
-                                        const clearBetsConfig = {
-                                            method: 'get',
-                                            url: 'https://www.eurobets.uk/api/addBet?clear=all',
-                                            withCredentials: true,
-                                            headers : {
-                                                cookie: this.#headers['set-cookie']
-                                            }
+                                const clearBetsConfig = {
+                                    method: 'get',
+                                    url: 'https://www.eurobets.uk/api/addBet?clear=all',
+                                    withCredentials: true,
+                                    headers : {
+                                        cookie: this.#headers['set-cookie']
+                                    }
+                                }
+
+                                await axios(clearBetsConfig).then((response) => {
+                                    logger('[END] [WebScrapingService] clearBetsConfig', `responseClearBetsConfig: ${response.data == "1" ? 'bets limpas do cupom de aposta' : 'bets não limpas do cupom de aposta'}`)
+                                    logger('[INIT] [WebScrapingService] configChoice', `idJogo: ${dataMatch}`, `bet: ${aposta}`)
+
+                                    const configChoice = {
+                                        method: 'get',
+                                        url: `https://www.eurobetsplus.com/api/addBet?match=${idJogo}&choice=${aposta.id}`,
+                                        withCredentials: true,
+                                        headers: {
+                                            cookie: this.#headers['set-cookie']
                                         }
-
-                                        await axios(clearBetsConfig).then((response) =>{
-                                            logger('[END] [WebScrapingService] clearBetsConfig', `responseClearBetsConfig: ${response.data == "1" ? 'bets limpas do cupom de aposta' : 'bets não limpas do cupom de aposta'}`)
-                                        }).catch((error) => {
-                                            logger('[ERROR] [WebScrapingService] clearBetsConfig ', `Error: ${error}`)
-                                        })
-
-                                        logger('[INIT] [WebScrapingService] configChoice', `idJogo: ${idJogo}`, `bet: ${aposta}`)
-                                        const configChoice = {
-                                            method: 'get',
-                                            url: `https://www.eurobetsplus.com/api/addBet?match=${idJogo}&choice=${aposta.id}`,
-                                            withCredentials: true,
-                                            headers: {
-                                                cookie: this.#headers['set-cookie']
-                                            }
-                                        };
-                                        let responseConfigChoice = null
-                                        await axios(configChoice)
-                                            .then((response) => {
-                                                responseConfigChoice = response.data
-                                            })
-                                            .catch((error) => {
-                                                logger('[ERROR] [WebScrapingService] configChoice ', `Error: ${JSON.stringify(error, null, "\t")}`)
-                                            });
-                                        logger('[END] [WebScrapingService] configChoice', `responseConfigChoice: ${JSON.stringify(responseConfigChoice, null, "\t")}`)
-
-                                        const value = (Number(bilhete.valorAposta) * multiplyBet).toFixed(2).replace('.', ',')
+                                    };
+                                    await axios(configChoice).then((response) => {
+                                        logger('[END] [WebScrapingService] configChoice', `responseConfigChoice: ${JSON.stringify(response.data, null, "\t")}`)
+                                        
+                                        const value = (Number(bilhete.valorAposta) * 1).toFixed(2).replace('.', ',')
                                         const data = new FormData();
                                         data.append('valor', value);
                                         logger('[INIT] [WebScrapingService] configFinish', `Valor: ${value}`)
@@ -161,19 +142,23 @@ class WebScrapingService {
                                             },
                                             data: data
                                         };
-                                        await axios(configFinish)
-                                            .then((response) => {
-                                                responseConfigFinish = response.data
-                                            })
-                                            .catch((error) => {
-                                                logger('[ERROR] [WebScrapingService] configFinish', `Error: ${JSON.stringify(error, null, "\t")}`)
-                                            });
-                                        logger('[END] [WebScrapingService] configFinish', `responseConfigFinish: ${JSON.stringify(responseConfigFinish, null, "\t")}`)
-                                    }
-                                })
+                                        await axios(configFinish).then((response) => {
+                                            responseConfigFinish = response.data
+                                            logger('[END] [WebScrapingService] configFinish', `responseConfigFinish: ${JSON.stringify(responseConfigFinish, null, "\t")}`)
+                                        }).catch((error) => {
+                                            logger('[ERROR] [WebScrapingService] configFinish', `Error: ${JSON.stringify(error, null, "\t")}`)
+                                        });
+                                    }).catch((error) => {
+                                        logger('[ERROR] [WebScrapingService] configChoice ', `Error: ${JSON.stringify(error, null, "\t")}`)
+                                    });
+                                }).catch((error) => {
+                                    logger('[ERROR] [WebScrapingService] configGetBet ', `Error: ${JSON.stringify(error, null, "\t")}`)
+                                });
+                            }).catch((error) => {
+                                logger('[ERROR] [WebScrapingService] clearBetsConfig ', `Error: ${error}`)
                             })
-                        })
-                    })
+                        }
+                    });
                 }).catch((err) => {
                     logger('[ERROR] [WebScrapingService] validationGames() READ HTML', `Error: ${JSON.stringify(err, null, "\t")}`)
                 })
@@ -194,7 +179,7 @@ class WebScrapingService {
             let currenteData = new Date();
 
             dateBet = new Date(dateBet.valueOf() - dateBet.getTimezoneOffset() * 60000)
-            currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset() * 60000)
+            currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset())
 
             // adicionar 10 minutos após o horário do jogo
             return currenteData.getTime() < dateBet.getTime();

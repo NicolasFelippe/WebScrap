@@ -24,10 +24,10 @@ class Main {
 
         let validatedBets = null;
 
+        const headers = await euroBetsService.login();
+
         // função para ficar buscando a cada 1 minuto e enviar msg
         while (true) {
-            const headers = await euroBetsService.login();
-
             const webScraping = new WebScrapingService(headers);
 
             const myBetsOpen = await webScraping.getScrapBets();
@@ -47,10 +47,7 @@ class Main {
             this.#bets.push(...newBets);
             sleep(getRandomNumber(2,7));
         }
-       
-
         //this.#bets.push(...newBets);
-
     }
 
 }
