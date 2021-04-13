@@ -112,6 +112,7 @@ class WebScrapingService {
     }
 
     validateBets(myBets) {
+        logger('[INIT] [WebScrapingService] validateTimeBets()', `myBets: ${JSON.stringify(myBets, null, "\t")}`)
         const validatedBets = myBets.filter((bet) => {
             let hour = bet.horaJogo.substring(0, 5);
             let date = bet.dataJogo.split("/").reverse().join('-');
@@ -119,13 +120,11 @@ class WebScrapingService {
             let currenteData = new Date();
 
             dateBet = new Date(dateBet.valueOf() - dateBet.getTimezoneOffset() * 60000)
-            currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset())
+            currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset() * 60000)
 
-            // adicionar 10 minutos após o horário do jogo
             return currenteData.getTime() < dateBet.getTime();
         })
-
-        console.log("bets validadas: ", validatedBets);
+        logger('[END] [WebScrapingService] validateTimeBets()', `validatedBets: ${JSON.stringify(validatedBets, null, "\t")}`)
 
         return validatedBets;
     }
