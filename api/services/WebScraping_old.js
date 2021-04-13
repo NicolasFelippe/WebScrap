@@ -24,12 +24,12 @@ class WebScrapingService {
             }
 
             await rp(options)
-                .then(async ($) => {
-                    await $('#accordion').children().each((i, item) => {
+                .then(($) => {
+                    $('#accordion').children().each((i, item) => {
                         if ($(item).find(`#heading${i + 1} > span`).text().includes('Aberto')) {
                             // pega dt e hora do bilhete
                             const [data, hora] = $(item).find(`#collapse${i + 1} > div > div > div:nth-child(1)`).text().split(' ')
-                            const match = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim().split('x')
+                            const match = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim()
                             const [timeCasa, timeVisitante] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div.mybet_item_title`).text().trim().split('x')
                             const [dataJogo, horaJogo] = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(2)`).text().trim().split(' ')
                             const statusAposta = $(item).find(`#collapse${i + 1} > div > div > div.col-12.col-sm-6.mybet_item > div:nth-child(3)`).text().trim()
@@ -84,10 +84,10 @@ class WebScrapingService {
             }
             await rp(options)
                 .then(($) => {
-                    myBetsOpen.forEach(bet => {
+                    myBetsOpen.forEach( bet => {
                         const match = $(`[data-matchname='${bet.match}']`)[0]
                         const dataMatch = $(match).attr('data-match');
-
+                        console.log('dataMatch', dataMatch)
                         if(dataMatch){
                             const configGetBet = {
                                 method: 'get',
@@ -98,7 +98,7 @@ class WebScrapingService {
                                 }
                             };
                             logger('[INIT] [WebScrapingService] getOptionsBet', `idJogo: ${dataMatch}`)
-                            await axios(configGetBet).then((response) => {
+                            axios(configGetBet).then((response) => {
                                 const { markets } = response.data
                                 aposta = markets[bet.statusAposta][bet.time.trim()]
                                 logger('[END] [WebScrapingService] getOptionsBet', `markets: ${aposta}`)
@@ -112,7 +112,7 @@ class WebScrapingService {
                                     }
                                 }
 
-                                await axios(clearBetsConfig).then((response) => {
+                                axios(clearBetsConfig).then( (response) => {
                                     logger('[END] [WebScrapingService] clearBetsConfig', `responseClearBetsConfig: ${response.data == "1" ? 'bets limpas do cupom de aposta' : 'bets não limpas do cupom de aposta'}`)
                                     logger('[INIT] [WebScrapingService] configChoice', `idJogo: ${dataMatch}`, `bet: ${aposta}`)
 
@@ -124,7 +124,7 @@ class WebScrapingService {
                                             cookie: this.#headers['set-cookie']
                                         }
                                     };
-                                    await axios(configChoice).then((response) => {
+                                    axios(configChoice).then( (response) => {
                                         logger('[END] [WebScrapingService] configChoice', `responseConfigChoice: ${JSON.stringify(response.data, null, "\t")}`)
                                         
                                         const value = (Number(bilhete.valorAposta) * 1).toFixed(2).replace('.', ',')
@@ -142,7 +142,7 @@ class WebScrapingService {
                                             },
                                             data: data
                                         };
-                                        await axios(configFinish).then((response) => {
+                                        axios(configFinish).then((response) => {
                                             responseConfigFinish = response.data
                                             logger('[END] [WebScrapingService] configFinish', `responseConfigFinish: ${JSON.stringify(responseConfigFinish, null, "\t")}`)
                                         }).catch((error) => {

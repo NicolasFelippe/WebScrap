@@ -5,3 +5,4 @@ yarn.lock
 error.log
 info.log
 *.log
+*.bat
