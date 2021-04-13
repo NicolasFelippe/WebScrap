@@ -13,10 +13,10 @@ const getOptions = (headers, dataMatch) => {
         .then(({ data }) => data)
 }
 
-const clearAll = (headers) => {
+const clearByMatch = (headers, dataMatch) => {
     const config = {
         method: 'get',
-        url: 'https://www.eurobets.uk/api/addBet?clear=all',
+        url: `https://www.eurobets.uk/api/addBet?clear=${dataMatch}`,
         withCredentials: true,
         headers: {
             cookie: headers['set-cookie']
@@ -60,4 +60,10 @@ const finishBet = (headers, data) => {
         .then(({ data }) => data)
 }
 
-module.exports = { getOptions, clearAll, addBet, finishBet }
+const getJsonCoupon = () =>{
+    const config = {
+        url: `https://www.eurobets.uk/api/getJSONCoupon`,
+    }
+}
+
+module.exports = { getOptions, clearByMatch, addBet, finishBet, getJsonCoupon }

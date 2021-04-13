@@ -1,7 +1,7 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const axios = require('axios');
-const { getOptions, clearAll, addBet, finishBet } = require('./axios')
+const { getOptions, clearByMatch, addBet, finishBet, getJsonCoupon } = require('./axios')
 const FormData = require('form-data');
 const { logger } = require('../util/util');
 class WebScrapingService {
@@ -91,10 +91,16 @@ class WebScrapingService {
                     const { markets } = await getOptions(this.#headers, dataMatch)
                     const aposta = markets[bet.statusAposta][bet.time.trim()]
                     console.log('aposta', aposta)
-                    const clear = await clearAll(this.#headers)
-                    console.log('clear', clear)
                     const betAdded = await addBet(this.#headers, dataMatch, aposta.id)
                     console.log('betAdded', betAdded)
+                    /*
+                    const betsCounpon = await getJsonCoupon();
+                    myBet = betsCounpon[dataMatch]
+                    var arr = Object.keys(betsCounpon)
+                    var betsCoupon = arr.filter((bet)=> bet != "login")
+                    */
+                    const clear = await clearByMatch(this.#headers)
+                    console.log('clear', clear)
                     const value = (Number(bet.valorAposta) * multiplyBet).toFixed(2).replace('.', ',')
                     const data = new FormData();
                     data.append('valor', value);
