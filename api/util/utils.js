@@ -9,9 +9,13 @@ const getRandomNumber = (min, max) => {
 const logger = (func, ...params) => {
     const date = new Date()
     const msg = `${func} Data: ${date.toLocaleDateString()} Hora: ${date.toLocaleTimeString()}
-    Parametros=\n ${JSON.stringify(params.join(', \n\t\t', null, '\t'))} \n`  
+    Parametros=\n ${params.join(', \n\t\t')} \n`  
  
     loggerWiston.info(msg)
+}
+
+const JsonToString = (object) => {
+  return JSON.stringify(object, null, '\t')
 }
 
 const sleep = (milliseconds) => {
@@ -24,5 +28,6 @@ const sleep = (milliseconds) => {
 module.exports = {
     getRandomNumber,
     logger,
-    sleep
+    sleep,
+    JsonToString
 }

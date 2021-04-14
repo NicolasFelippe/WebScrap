@@ -1,56 +1,70 @@
-const dotenv = require('dotenv').config()
+const dotenv = require('dotenv').config();
+const EuroBetsService = require('../api/services/EuroBetsService_old');
+const WebScrapingService = require('../api/services/WebScraping');
 const TelegramBot = require(`node-telegram-bot-api`);
-const EuroBetsService = require('../api/services/EuroBetsService')
-const WebScrapingService = require('../api/services/WebScrapingService')
-const message = require('../api/util/template-message');
-const { getRandomNumber, logger, sleep } = require('../api/util/util');
-class WebAutomation {
+const { login } = require('../api/services/eurobets-service')
+const { getRandomNumber, logger, sleep, JsonToString } = require('../api/util/utils');
+
+class Main {
     #bets = [];
-    constructor() { }
+
+    constructor() {
+
+    }
 
     async start() {
-        const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET } = dotenv.parsed;
+        if (dotenv.error) {
+            console.debug(error);
+        }
+        const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET, COOKIE } = dotenv.parsed;
 
         const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
 
-        const euroBetsService = new EuroBetsService(USER, PASS);
+        // const euroBetsService = new EuroBetsService(USER, PASS);
 
+        let validatedBets = null;
+        let auth = false
+        let headers = null
+        let countAuth = 1
+        while (!auth) {
+            logger('[INIT] [EuroBetsService] login()', `user: ${USER}`)
+            headers = await login(USER, PASS, COOKIE);
+            if (headers['set-cookie']) {
+                auth = true
+                logger('[END] [EuroBetsService] login()', `headers: AUTENTICADO`, `Tentativas: ${countAuth}`)
+            } else {
+                logger('[ERRO] [EuroBetsService] login()', `Tentativas: ${countAuth}`)
+            }
+            countAuth++
+        }
+        // função para ficar buscando a cada 1 minuto e enviar msg
         while (true) {
-            logger('[INIT] [WebAutomation] start()', `User: ${USER}`, `MultiplyBet: ${MULTIPLYBET}`)
-            const headers = await euroBetsService.login();
-
             const webScraping = new WebScrapingService(headers);
 
             const myBetsOpen = await webScraping.getScrapBets();
 
-            const validatedBets = webScraping.validateTimeBets(myBetsOpen);
+            validatedBets = webScraping.validateBets(myBetsOpen);
 
-            if (validatedBets.length > 0) {
-                const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
+            const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
+            if (Array.isArray(newBets) && newBets.length > 0) {
+                telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${JsonToString(newBets)}`)
+                    .then((success) => console.log('mensagem enviada ao grupo'))
+                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
 
-                if (Array.isArray(newBets) && newBets.length > 0) {
-                    const bets = await webScraping.validationGames(newBets);
-                    bets.forEach(async ({ idJogo, openBet }) => {
-                        const market = await euroBetsService.getGameOptions(idJogo, openBet);
-                        await euroBetsService.registerBet(market.id, idJogo);
-                        await euroBetsService.finishBet(openBet, MULTIPLYBET);
-                    })
-                }
-
-                if (Array.isArray(newBets) && newBets.length > 0) {
-                    const msg = await message.templateMessage(newBets)
-                    telegramService.sendMessage(GROUP_ID_TELEGRAM, msg)
-                        .then((success) => logger('[SUCCESS] send message group telegram', `Response: ${success}`))
-                        .catch((err) => logger('[ERROR] send message group telegram', `Error: ${err}`));
-                }
-
-                this.#bets.push(...newBets);
+                const response = await webScraping.validationGames(newBets, MULTIPLYBET);
+                telegramService.sendMessage(GROUP_ID_TELEGRAM, `SUCESSO REPLICADAS \n ${JsonToString(response)}`)
+                    .then((success) => console.log('mensagem enviada ao grupo'))
+                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
             }
-            logger('[END] [WebAutomation] start()', `Bets: ${JSON.stringify(this.#bets, null, "\t")}`)
 
-            sleep(getRandomNumber(2,7));
+
+
+            this.#bets.push(...newBets);
+            sleep(getRandomNumber(2, 7));
         }
+        //this.#bets.push(...newBets);
     }
+
 }
 
-module.exports = WebAutomation;
+module.exports = new Main();
