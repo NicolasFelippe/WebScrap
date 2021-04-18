@@ -2,35 +2,15 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { JsonToString } = require('../util/utils')
 
-const getOptions = (headers, dataMatch) => {
-    const config = {
-        method: 'get',
-        url: `https://www.eurobets.uk/api/getOptions/${dataMatch}`,
-        withCredentials: true,
-        headers: {
-            cookie: headers['set-cookie']
-        }
-    };
-    return axios(config)
-        .then(({ data }) => data)
-        .catch((error) => {
-            throw `[ERROR] getOptions ${JsonToString(error)}`
-        })
-} 
-
-const login = (user, pass, envCookie) => {
+const login = (user, pass) => {
     const data = new FormData();
     data.append('user', user);
     data.append('pass', pass);
-    cookie = {
-        'Cookie': envCookie,
-    }
     const config = {
         method: 'post',
         url: 'https://www.eurobetsplus.com/api/login',
         withCredentials: true,
         headers: {
-            cookie,
             ...data.getHeaders()
         },
         data: data
@@ -42,38 +22,6 @@ const login = (user, pass, envCookie) => {
             throw `[ERROR] login ${JsonToString(error)}`
         })
 } 
-
-const clearByMatch = (headers, dataMatch) => {
-    const config = {
-        method: 'get',
-        url: `https://www.eurobets.uk/api/addBet?clear=${dataMatch}`,
-        withCredentials: true,
-        headers: {
-            cookie: headers['set-cookie']
-        }
-    }
-    return axios(config)
-        .then(({ data }) => data)
-        .catch((error) => {
-            throw `[ERROR] clearByMatch ${JsonToString(error)}`
-        })
-}
-
-const clearAllCoupon = (headers) => {
-    const config = {
-        method: 'get',
-        url: `https://www.eurobets.uk/api/addBet?clear=all`,
-        withCredentials: true,
-        headers: {
-            cookie: headers['set-cookie']
-        }
-    }
-    return axios(config)
-        .then(({ data }) => data)
-        .catch((error) => {
-            throw `[ERROR] clearAllCoupon ${JsonToString(error)}`
-        })
-}
 
 const addBet = (headers, idJogo, apostaId) => {
     console.log('url', `https://www.eurobets.uk/api/addBet?match=${idJogo}&choice=${apostaId}`)
@@ -128,4 +76,4 @@ const getJsonCoupon = (headers) => {
         })
 }
 
-module.exports = { getOptions, clearByMatch, addBet, finishBet, getJsonCoupon, clearAllCoupon, login }
+module.exports = { addBet, finishBet, getJsonCoupon, login }

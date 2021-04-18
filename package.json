@@ -1,33 +1,30 @@
 {
-  "name": "webscrap",
+  "name": "finishbet",
   "version": "1.0.0",
-  "description": "robo aposta",
+  "description": "realiza as apostas para os usuários que foram passados por parâmetro",
   "main": "index.js",
+  "bin": {
+    "finishbet": "WebAutomation.js"
+  },
   "scripts": {
-    "test": "npm run teste",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./index.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NicolasFelippe/WebScrappingEuroBets.git"
+    "url": "git+https://github.com/NicolasFelippe/WebScrap.git"
   },
-  "author": "Nicolas Felippe da Rocha",
+  "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/NicolasFelippe/WebScrappingEuroBets/issues"
+    "url": "https://github.com/NicolasFelippe/WebScrap/issues"
   },
-  "homepage": "https://github.com/NicolasFelippe/WebScrappingEuroBets#readme",
+  "homepage": "https://github.com/NicolasFelippe/WebScrap#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "cheerio": "^1.0.0-rc.5",
-    "date-fns": "^2.19.0",
     "dotenv": "^8.2.0",
     "form-data": "^4.0.0",
-    "lodash": "^4.17.21",
-    "node-telegram-bot-api": "^0.51.0",
-    "puppeteer": "^8.0.0",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6",
+    "minimist": "^1.2.5",
     "winston": "^3.3.3"
   }
 }

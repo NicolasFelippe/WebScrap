@@ -1,70 +1,51 @@
 const dotenv = require('dotenv').config();
-const EuroBetsService = require('../api/services/EuroBetsService_old');
 const WebScrapingService = require('../api/services/WebScraping');
-const TelegramBot = require(`node-telegram-bot-api`);
 const { login } = require('../api/services/eurobets-service')
-const { getRandomNumber, logger, sleep, JsonToString } = require('../api/util/utils');
+const { logger } = require('../api/util/utils');
+const { _ } = require('minimist')(process.argv.slice(2));
 
 class Main {
-    #bets = [];
-
     constructor() {
-
     }
 
     async start() {
         if (dotenv.error) {
             console.debug(error);
         }
-        const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET, COOKIE } = dotenv.parsed;
 
-        const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
+        console.log("args constructor", _)
+        const [ user, dataMatch, apostaId ] = _;
+        let betId = apostaId.split("id=")[1]
+        console.log("args: ", user, dataMatch, betId)
 
-        // const euroBetsService = new EuroBetsService(USER, PASS);
+        console.log("entrou no start com os parâmetros: ", user, dataMatch, betId)
+        const { USER, PASS, BETVALUE } = dotenv.parsed;
 
-        let validatedBets = null;
         let auth = false
         let headers = null
         let countAuth = 1
-        while (!auth) {
-            logger('[INIT] [EuroBetsService] login()', `user: ${USER}`)
-            headers = await login(USER, PASS, COOKIE);
-            if (headers['set-cookie']) {
-                auth = true
-                logger('[END] [EuroBetsService] login()', `headers: AUTENTICADO`, `Tentativas: ${countAuth}`)
-            } else {
-                logger('[ERRO] [EuroBetsService] login()', `Tentativas: ${countAuth}`)
+
+        try {
+            while (!auth) {
+                logger('[INIT] [EuroBetsService] login()', `user: ${USER}`)
+                headers = await login(USER, PASS);
+                if (headers['set-cookie']) {
+                    auth = true
+                    logger('[END] [EuroBetsService] login()', `headers: AUTENTICADO`, `Tentativas: ${countAuth}`)
+                } else {
+                    logger('[ERRO] [EuroBetsService] login()', `Tentativas: ${countAuth}`)
+                }
+                if(countAuth > 4) throw "Não conseguiu logar";
+                countAuth++
             }
-            countAuth++
-        }
-        // função para ficar buscando a cada 1 minuto e enviar msg
-        while (true) {
+    
             const webScraping = new WebScrapingService(headers);
-
-            const myBetsOpen = await webScraping.getScrapBets();
-
-            validatedBets = webScraping.validateBets(myBetsOpen);
-
-            const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
-            if (Array.isArray(newBets) && newBets.length > 0) {
-                telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${JsonToString(newBets)}`)
-                    .then((success) => console.log('mensagem enviada ao grupo'))
-                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
-
-                const response = await webScraping.validationGames(newBets, MULTIPLYBET);
-                telegramService.sendMessage(GROUP_ID_TELEGRAM, `SUCESSO REPLICADAS \n ${JsonToString(response)}`)
-                    .then((success) => console.log('mensagem enviada ao grupo'))
-                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
-            }
-
-
-
-            this.#bets.push(...newBets);
-            sleep(getRandomNumber(2, 7));
+    
+            const response = await webScraping.validationGames(BETVALUE, dataMatch, betId);
+        } catch (error) {
+            logger('[ERRO] Login()', error);
         }
-        //this.#bets.push(...newBets);
     }
-
 }
 
 module.exports = new Main();
