@@ -18,7 +18,7 @@ class Main {
         }
         const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET, COOKIE } = dotenv.parsed;
 
-        const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
+        //const telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
 
         // const euroBetsService = new EuroBetsService(USER, PASS);
 
@@ -47,14 +47,14 @@ class Main {
 
             const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
             if (Array.isArray(newBets) && newBets.length > 0) {
-                telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${JsonToString(newBets)}`)
+                /* telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${JsonToString(newBets)}`)
                     .then((success) => console.log('mensagem enviada ao grupo'))
-                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
+                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err)); */
 
                 const response = await webScraping.validationGames(newBets, MULTIPLYBET);
-                telegramService.sendMessage(GROUP_ID_TELEGRAM, `SUCESSO REPLICADAS \n ${JsonToString(response)}`)
+                /* telegramService.sendMessage(GROUP_ID_TELEGRAM, `SUCESSO REPLICADAS \n ${JsonToString(response)}`)
                     .then((success) => console.log('mensagem enviada ao grupo'))
-                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
+                    .catch((err) => console.log('erro ao enviar mensagem para o grupo', err)); */
             }
 
 

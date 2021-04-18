@@ -1,7 +1,9 @@
 const { getOptions, addBet, finishBet, getJsonCoupon, clearAllCoupon } = require('./eurobets-service')
 const FormData = require('form-data');
 const { logger, JsonToString } = require('../util/utils');
-const { getSportBookByFutebol, getMyBets } = require('./scraping')
+const { getSportBookByFutebol, getMyBets } = require('./scraping');
+const { exec } = require('child_process');
+const ReplyBets = require('./reply-bets.service');
 
 class WebScrapingService {
     #headers
@@ -85,6 +87,9 @@ class WebScrapingService {
                             betsFinish.push(betFinish)
                         }
                     }
+
+                    const users = ReplyBets.getUsers()
+                    ReplyBets.replyBets(users);
                 }
             }
             
@@ -110,8 +115,8 @@ class WebScrapingService {
             const betFinish = await finishBet(this.#headers, data)
             console.log('betFinish', betFinish)
             if (count <= 6 && betFinish.status !== 1 && !betFinish.codigo && !betFinish.credito) {
-                await this.addAndFinishBet(dataMatch, apostaId, bet, multiplyBet, count)
                 count++
+                await this.addAndFinishBet(dataMatch, apostaId, bet, multiplyBet, count)
                 logger('[TENTATIVAS] [WebScrapingService] addAndFinishBet()', `TENTATIVAS: ${count}`)
             } else {
                 logger('[END] [WebScrapingService] addAndFinishBet()', `finishBet: ${JsonToString(betFinish)}`, `Tentativas: ${count}`)
@@ -131,7 +136,7 @@ class WebScrapingService {
 
     validateBets(myBets) {
         logger('[INIT] [WebScrapingService] validateTimeBets()', `myBets: ${JsonToString(myBets)}`)
-        const validatedBets = myBets.filter((bet) => {
+        const validatedBets = myBets?.filter((bet) => {
             let hour = bet.horaJogo.substring(0, 5);
             let date = bet.dataJogo.split("/").reverse().join('-');
             let dateBet = new Date(`${date} ${hour}`);
@@ -148,7 +153,7 @@ class WebScrapingService {
     }
 
     verifyNewBets(validatedBets, bets) {
-        const newBets = validatedBets.filter((validatedBet) => {
+        const newBets = validatedBets?.filter((validatedBet) => {
             return !bets.some((bet) => {
                 return bet.timeCasa === validatedBet.timeCasa
                     && bet.timeVisitante === validatedBet.timeVisitante
