@@ -136,7 +136,7 @@ class WebScrapingService {
 
     validateBets(myBets) {
         logger('[INIT] [WebScrapingService] validateTimeBets()', `myBets: ${JsonToString(myBets)}`)
-        const validatedBets = myBets?.filter((bet) => {
+        const validatedBets = myBets.filter((bet) => {
             let hour = bet.horaJogo.substring(0, 5);
             let date = bet.dataJogo.split("/").reverse().join('-');
             let dateBet = new Date(`${date} ${hour}`);
@@ -153,7 +153,8 @@ class WebScrapingService {
     }
 
     verifyNewBets(validatedBets, bets) {
-        const newBets = validatedBets?.filter((validatedBet) => {
+        // if (Array.isArray(validatedBets) && validatedBets.length > 0 || Array.isArray(bets) && bets.length > 0) return null
+        const newBets = validatedBets.filter((validatedBet) => {
             return !bets.some((bet) => {
                 return bet.timeCasa === validatedBet.timeCasa
                     && bet.timeVisitante === validatedBet.timeVisitante
