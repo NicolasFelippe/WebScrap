@@ -59,7 +59,9 @@ class Main {
 
 
 
-            this.#bets.push(...newBets);
+            if(Array.isArray(newBets)){
+                this.#bets.push(...newBets)
+            } 
             sleep(getRandomNumber(2, 7));
         }
         //this.#bets.push(...newBets);

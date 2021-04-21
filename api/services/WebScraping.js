@@ -89,7 +89,7 @@ class WebScrapingService {
                     }
 
                     const users = ReplyBets.getUsers()
-                    ReplyBets.replyBets(users);
+                    await ReplyBets.replyBets(users, dataMatch, aposta.id);
                 }
             }
             
