@@ -56,16 +56,16 @@ class Main {
 
             const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
 
-            telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${JsonToString(newBets)}`)
+            if (Array.isArray(newBets) && newBets.length > 0) {
+                if (TELEGRAM) {
+                    telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${JsonToString(newBets)}`)
+                        .then((success) => console.log('mensagem enviada ao grupo'))
+                        .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
+
+                    telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${JsonToString(newBets)}`)
                         .then((success) => logger('mensagem enviada ao grupo de notificação'))
                         .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
-
-            if (Array.isArray(newBets) && newBets.length > 0) {
-                // if (TELEGRAM) {
-                //     telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${JsonToString(newBets)}`)
-                //         .then((success) => console.log('mensagem enviada ao grupo'))
-                //         .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
-                // }
+                }
 
                 const response = await webScraping.validationGames(newBets, MULTIPLYBET);
                 if (TELEGRAM) {
