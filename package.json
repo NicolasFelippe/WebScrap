@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run teste",
     "start": "node ./index.js",
-    "children": "node ../ReplyBets/index.js"
+    "children": "node ../replyBets/index.js"
   },
   "repository": {
     "type": "git",
