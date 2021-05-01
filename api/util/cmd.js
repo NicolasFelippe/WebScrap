@@ -1,13 +1,25 @@
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
 
+const execute = (command, ...args) => {
+    const ls = spawn(command, args);
 
-const execute = (command) => { 
-    exec(command,{detached: false},(error, stdout, stderr) => {
-    if (error) {
-    throw error;
-    }
-    console.log(stdout);
-})};    
+    ls.stdout.on("data", data => {
+        console.log(`stdout: ${data}`);
+    });
+    
+    ls.stderr.on("data", data => {
+        console.log(`stderr: ${data}`);
+    });
+    
+    ls.on('error', (error) => {
+        console.log(`error: ${error.message}`);
+    });
+    
+    ls.on("close", code => {
+        console.log(`child process exited with code ${code}`);
+    });
 
-module.exports = {execute}
+}
+
+module.exports = { execute }

@@ -2,7 +2,6 @@ const { getOptions, addBet, finishBet, getJsonCoupon, clearAllCoupon } = require
 const FormData = require('form-data');
 const { logger, JsonToString } = require('../util/utils');
 const { getSportBookByFutebol, getMyBets } = require('./scraping');
-const { exec } = require('child_process');
 const ReplyBets = require('./reply-bets.service');
 
 class WebScrapingService {
@@ -94,7 +93,7 @@ class WebScrapingService {
                     }
 
                     const users = ReplyBets.getUsers()
-                    logger("[END] multiplyChild: ", multiplyChild)
+                    logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
                     await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
