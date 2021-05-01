@@ -58,18 +58,18 @@ class Main {
 
             if (Array.isArray(newBets) && newBets.length > 0) {
                 if (TELEGRAM) {
-                    telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${JsonToString(newBets)}`)
-                        .then((success) => console.log('mensagem enviada ao grupo'))
-                        .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
-                    const msg = newBets.map(bet => ({
+                    const msg = JsonToString(newBets.map(bet => ({
                         'Partida': bet.match,
                         'Time Casa': bet.timeCasa,
                         'Time Visitante': bet.timeVisitante,
                         'Data Jogo': `${bet.dataJogo} - ${bet.horaJogo}`,
                         'Aposta': `${bet.statusAposta} - ${bet.time}`,
-                        'Odd': `**${bet.odd}**`
-                    }))
-                    telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${JsonToString(msg)}`)
+                        'Odd': bet.odd
+                    })))
+                    telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${msg}`)
+                        .then((success) => console.log('mensagem enviada ao grupo'))
+                        .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
+                    telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${msg}`)
                         .then((success) => logger('mensagem enviada ao grupo de notificação'))
                         .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
                 }
