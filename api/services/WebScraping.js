@@ -93,14 +93,9 @@ class WebScrapingService {
                         }
                     }
 
-<<<<<<< HEAD
                     const users = ReplyBets.getUsers()
                     logger("[END] multiplyChild: ", multiplyChild)
                     await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
-=======
-                    // const users = ReplyBets.getUsers()
-                    // await ReplyBets.replyBets(users, dataMatch, aposta.id);
->>>>>>> 17b85e83b3cbfd018579021c3862d5ce0ddf8271
                 }
             }
             
