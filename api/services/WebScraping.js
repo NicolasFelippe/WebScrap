@@ -58,6 +58,8 @@ class WebScrapingService {
     async validationGames(myBetsOpen, multiplyBet) {
         logger('[INIT] [WebScrapingService] validationGames()', `myBetsOpen: ${JsonToString(myBetsOpen)}`)
         const betsFinish = []
+        let multiplyChild;
+
         try {
             const $ = await getSportBookByFutebol(this.#headers)
             for (let bet of myBetsOpen) {
@@ -81,15 +83,19 @@ class WebScrapingService {
                     if (betsCoupon.length === 0) {
                         const betFinish = await this.addAndFinishBet(dataMatch, aposta.id, bet, multiplyBet, count)
                         betsFinish.push(betFinish)
+                        logger("valor aposta: ", betFinish.bet.valorAposta)
+                        multiplyChild = betFinish.bet.valorAposta > 70 ? 2 : 1;
                     } else {
                         for (let betCoupon of betsCoupon) {
                             const betFinish = await this.addAndFinishBet(betCoupon.match_id, betCoupon.opcao_id, bet, multiplyBet, count)
                             betsFinish.push(betFinish)
+                            multiplyChild = betFinish.bet.valorAposta > 70 ? 2 : 1;
                         }
                     }
 
                     const users = ReplyBets.getUsers()
-                    await ReplyBets.replyBets(users, dataMatch, aposta.id);
+                    logger("[END] multiplyChild: ", multiplyChild)
+                    await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
             
