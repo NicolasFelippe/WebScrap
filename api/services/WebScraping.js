@@ -94,7 +94,7 @@ class WebScrapingService {
 
                     const users = ReplyBets.getUsers()
                     logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
-                    ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
+                    await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
             

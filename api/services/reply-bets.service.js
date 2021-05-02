@@ -18,7 +18,7 @@ const getUsers = (_) => {
     ];
 }
 
-const replyBets = (users, idMatch, betId, multiplyChild) => {
+const replyBets = async (users, idMatch, betId, multiplyChild) => {
     for (user of users) {
         logger('[INIT] [Reply Bets] replayBets()', `execucao cmd: ${user.login}, ${user.password}, ${idMatch}, ${betId}, ${multiplyChild}, ${user.value}`)
         cmd.execute(`./processChildren.sh`, user.login, user.password, user.value * multiplyChild, idMatch, betId, '&')
