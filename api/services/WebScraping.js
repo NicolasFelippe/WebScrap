@@ -83,18 +83,18 @@ class WebScrapingService {
                         const betFinish = await this.addAndFinishBet(dataMatch, aposta.id, bet, multiplyBet, count)
                         betsFinish.push(betFinish)
                         logger("valor aposta: ", betFinish.bet.valorAposta)
-                        multiplyChild = betFinish.bet.valorAposta > 70 ? 2 : 1;
+                        multiplyChild = Number(betFinish.bet.valorAposta) >= 70 ? 2 : 1;
                     } else {
                         for (let betCoupon of betsCoupon) {
                             const betFinish = await this.addAndFinishBet(betCoupon.match_id, betCoupon.opcao_id, bet, multiplyBet, count)
                             betsFinish.push(betFinish)
-                            multiplyChild = betFinish.bet.valorAposta > 70 ? 2 : 1;
+                            multiplyChild = Number(betFinish.bet.valorAposta) > 70 ? 2 : 1;
                         }
                     }
 
                     const users = ReplyBets.getUsers()
                     logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
-                    await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
+                    ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
             
