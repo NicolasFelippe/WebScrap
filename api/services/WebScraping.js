@@ -83,7 +83,7 @@ class WebScrapingService {
                         const betFinish = await this.addAndFinishBet(dataMatch, aposta.id, bet, multiplyBet, count)
                         betsFinish.push(betFinish)
                         logger("valor aposta: ", betFinish.bet.valorAposta)
-                        multiplyChild = Number(betFinish.bet.valorAposta) >= 70 ? 2 : 1;
+                        multiplyChild = Number(betFinish.bet.valorAposta) > 70 ? 2 : 1;
                     } else {
                         for (let betCoupon of betsCoupon) {
                             const betFinish = await this.addAndFinishBet(betCoupon.match_id, betCoupon.opcao_id, bet, multiplyBet, count)
