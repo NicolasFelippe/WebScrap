@@ -76,7 +76,6 @@ const clearAllCoupon = (headers) => {
 }
 
 const addBet = (headers, idJogo, apostaId) => {
-    console.log('url', `https://www.eurobets.uk/api/addBet?match=${idJogo}&choice=${apostaId}`)
     const config = {
         method: 'get',
         url: `https://www.eurobets.uk/api/addBet?match=${idJogo}&choice=${apostaId}`,

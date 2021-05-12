@@ -2,8 +2,6 @@ const { getOptions, addBet, finishBet, getJsonCoupon, clearAllCoupon } = require
 const FormData = require('form-data');
 const { logger, JsonToString } = require('../util/utils');
 const { getSportBookByFutebol, getMyBets } = require('./scraping');
-const ReplyBets = require('./reply-bets.service');
-
 class WebScrapingService {
     #headers
     constructor(headers) {
@@ -64,30 +62,27 @@ class WebScrapingService {
             for (let bet of myBetsOpen) {
                 const match = $(`[data-matchname='${bet.match}']`)[0]
                 const dataMatch = $(match).attr('data-match');
-                console.log('dataMatch', dataMatch)
                 if (dataMatch) {
                     const { markets } = await getOptions(this.#headers, dataMatch)
                     const aposta = markets[bet.statusAposta][bet.time.trim()]
-                    console.log('aposta', aposta)
 
                     const betsCounpon = await getJsonCoupon(this.#headers);
-                    console.log('getJsonCoupon', betsCounpon)
 
                     const clear = await clearAllCoupon(this.#headers)
-                    console.log('clear', clear)
 
                     let betsCoupon = Object.values(betsCounpon).filter((bet) => bet.match_id && bet.nome)
-                    console.log('betscoupon filter', betsCoupon.length)
                     let count = 1
                     if (betsCoupon.length === 0) {
                         const betFinish = await this.addAndFinishBet(dataMatch, aposta.id, bet, multiplyBet, count)
                         betsFinish.push(betFinish)
-                        logger("valor aposta: ", betFinish.bet.valorAposta)
+                        logger('valor aposta: ', betFinish.bet.valorAposta)
                         multiplyChild = Number(betFinish.bet.valorAposta) > 70 ? 2 : 1;
                     } else {
                         for (let betCoupon of betsCoupon) {
                             const betFinish = await this.addAndFinishBet(betCoupon.match_id, betCoupon.opcao_id, bet, multiplyBet, count)
                             betsFinish.push(betFinish)
+                            betFinish.filter(asdsa => asdsad)
+                                .map(asdasdasdasd)
                             multiplyChild = Number(betFinish.bet.valorAposta) > 70 ? 2 : 1;
                         }
                     }
@@ -97,7 +92,7 @@ class WebScrapingService {
                     await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
-            
+
         } catch (error) {
             logger(error)
             return null
@@ -113,12 +108,10 @@ class WebScrapingService {
             `apostaId: ${JsonToString(apostaId)}`, `valorAposta: ${JsonToString(bet.valorAposta * multiplyBet)}`)
         try {
             const betAdded = await addBet(this.#headers, dataMatch, apostaId)
-            console.log('betAdded', betAdded)
             const value = (Number(bet.valorAposta) * multiplyBet).toFixed(2).replace('.', ',')
             const data = new FormData();
             data.append('valor', value);
             const betFinish = await finishBet(this.#headers, data)
-            console.log('betFinish', betFinish)
             if (count <= 6 && betFinish.status !== 1 && !betFinish.codigo && !betFinish.credito) {
                 count++
                 await this.addAndFinishBet(dataMatch, apostaId, bet, multiplyBet, count)
@@ -158,7 +151,6 @@ class WebScrapingService {
     }
 
     verifyNewBets(validatedBets, bets) {
-        // if (Array.isArray(validatedBets) && validatedBets.length > 0 || Array.isArray(bets) && bets.length > 0) return null
         const newBets = validatedBets.filter((validatedBet) => {
             return !bets.some((bet) => {
                 return bet.timeCasa === validatedBet.timeCasa

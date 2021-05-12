@@ -1,7 +1,6 @@
 #!/bin/bash
 echo "Bot children"
 echo "user: $1"
-echo "password: $2"
 echo "valoraposta: $3"
 echo "idMatch: $4"
 echo "betId: $5"
