@@ -83,7 +83,7 @@ class Main {
 
             }
 
-            if (Array.isArray(newBets)) {
+            if (Array.isArray(newBets) && newBets.length > 0) {
                 this.#bets.push(...newBets)
             }
             sleep(getRandomNumber(1, 3));

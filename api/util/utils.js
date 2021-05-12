@@ -10,8 +10,8 @@ const logger = (func, ...params) => {
     const date = new Date()
     const msg = `${func} Data: ${date.toLocaleDateString()} Hora: ${date.toLocaleTimeString()}
     Parametros=\n ${params.join(', \n\t\t')} \n`  
- 
-    loggerWiston.info(msg)
+    console.log(msg)
+    // loggerWiston.info(msg)
 }
 
 const JsonToString = (object) => {
