@@ -1,6 +1,6 @@
 const dotenv = require('dotenv').config();
 const WebScrapingService = require('../api/services/WebScraping');
-const TelegramBot = require(`node-telegram-bot-api`);
+// const TelegramBot = require(`node-telegram-bot-api`);
 const { login } = require('../api/services/eurobets-service')
 const { getRandomNumber, logger, sleep, JsonToString } = require('../api/util/utils');
 
@@ -17,10 +17,10 @@ class Main {
         }
         const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET, COOKIE, GROUP_NOTIFICATION, TELEGRAM } = dotenv.parsed;
         let telegramService = null
-        console.log(TELEGRAM)
-        if (TELEGRAM) {
-            telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
-        }
+        // console.log(TELEGRAM)
+        // if (TELEGRAM) {
+        //     telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
+        // }
         // FUNÇÃO USADA PARA DESCOBRIR O ID DO GRUPO TELEGRAM
         // telegramService.on('message', (msg) => {
         //     const chatId = msg.chat.id;
@@ -57,7 +57,7 @@ class Main {
             const newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
 
             if (Array.isArray(newBets) && newBets.length > 0) {
-                if (TELEGRAM) {
+                /* if (TELEGRAM) {
                     const msg = JsonToString(newBets.map(bet => ({
                         'Partida': bet.match,
                         'Time Casa': bet.timeCasa,
@@ -72,14 +72,14 @@ class Main {
                     telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${msg}`)
                         .then((success) => logger('mensagem enviada ao grupo de notificação'))
                         .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
-                }
+                } */
 
                 const response = await webScraping.validationGames(newBets, MULTIPLYBET);
-                if (TELEGRAM) {
+               /*  if (TELEGRAM) {
                     telegramService.sendMessage(GROUP_ID_TELEGRAM, `SUCESSO REPLICADAS \n ${JsonToString(response)}`)
                         .then((success) => logger('mensagem enviada ao grupo'))
                         .catch((err) => logger('erro ao enviar mensagem para o grupo', JsonToString(err)));
-                }
+                } */
 
             }
 
