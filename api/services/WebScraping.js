@@ -2,6 +2,7 @@ const { getOptions, addBet, finishBet, getJsonCoupon, clearAllCoupon } = require
 const FormData = require('form-data');
 const { logger, JsonToString } = require('../util/utils');
 const { getSportBookByFutebol, getMyBets } = require('./scraping');
+const ReplyBets = require('./reply-bets.service');
 class WebScrapingService {
     #headers
     constructor(headers) {
