@@ -26,6 +26,7 @@
     "dotenv": "^8.2.0",
     "form-data": "^4.0.0",
     "lodash": "^4.17.21",
+    "node-schedule": "^2.0.0",
     "node-telegram-bot-api": "^0.51.0",
     "puppeteer": "^8.0.0",
     "request": "^2.88.2",

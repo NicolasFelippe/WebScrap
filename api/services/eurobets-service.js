@@ -1,6 +1,6 @@
 const axios = require('axios');
 const FormData = require('form-data');
-const { JsonToString } = require('../util/utils')
+const { JsonToString, logger } = require('../util/utils')
 
 const getOptions = (headers, dataMatch) => {
     const config = {
@@ -16,7 +16,7 @@ const getOptions = (headers, dataMatch) => {
         .catch((error) => {
             throw `[ERROR] getOptions ${JsonToString(error)}`
         })
-} 
+}
 
 const login = (user, pass, envCookie) => {
     const data = new FormData();
@@ -41,7 +41,27 @@ const login = (user, pass, envCookie) => {
         .catch((error) => {
             throw `[ERROR] login ${JsonToString(error)}`
         })
-} 
+}
+
+const authenticate = async (user, password, cookie) => {
+    let headers = null
+    let countAuth = 1
+    let auth = false
+    while (!auth) {
+        logger('[INIT] [EuroBetsService] login()', `user: ${user}`)
+        headers = await login(user, password, cookie);
+        if (headers['set-cookie']) {
+            auth = true
+            logger('[END] [EuroBetsService] login()', `headers: AUTENTICADO`, `Tentativas: ${countAuth}`)
+        } else {
+            logger('[ERRO] [EuroBetsService] login()', `Tentativas: ${countAuth}`)
+        }
+        
+        if(countAuth > 4) return headers
+        countAuth++
+    }
+    return headers
+}
 
 const clearByMatch = (headers, dataMatch) => {
     const config = {
@@ -127,4 +147,4 @@ const getJsonCoupon = (headers) => {
         })
 }
 
-module.exports = { getOptions, clearByMatch, addBet, finishBet, getJsonCoupon, clearAllCoupon, login }
+module.exports = { getOptions, clearByMatch, addBet, finishBet, getJsonCoupon, clearAllCoupon, login, authenticate }

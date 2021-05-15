@@ -2,7 +2,7 @@ const { getOptions, addBet, finishBet, getJsonCoupon, clearAllCoupon } = require
 const FormData = require('form-data');
 const { logger, JsonToString } = require('../util/utils');
 const { getSportBookByFutebol, getMyBets } = require('./scraping');
-const ReplyBets = require('./reply-bets.service');
+const { worker } = require('./worker-service');
 class WebScrapingService {
     #headers
     constructor(headers) {
@@ -56,8 +56,8 @@ class WebScrapingService {
     async validationGames(myBetsOpen, multiplyBet) {
         logger('[INIT] [WebScrapingService] validationGames()', `myBetsOpen: ${JsonToString(myBetsOpen)}`)
         const betsFinish = []
-        let multiplyChild;
-
+        let multiplyChild = null;
+        let betsCounpon = null;
         try {
             const $ = await getSportBookByFutebol(this.#headers)
             for (let bet of myBetsOpen) {
@@ -67,11 +67,11 @@ class WebScrapingService {
                     const { markets } = await getOptions(this.#headers, dataMatch)
                     const aposta = markets[bet.statusAposta][bet.time.trim()]
 
-                    const betsCounpon = await getJsonCoupon(this.#headers);
+                    betsCounpon = await getJsonCoupon(this.#headers);
 
-                    const clear = await clearAllCoupon(this.#headers)
+                    await clearAllCoupon(this.#headers)
 
-                    let betsCoupon = Object.values(betsCounpon).filter((bet) => bet.match_id && bet.nome)
+                    const betsCoupon = Object.values(betsCounpon).filter((bet) => bet.match_id && bet.nome)
                     let count = 1
                     if (betsCoupon.length === 0) {
                         const betFinish = await this.addAndFinishBet(dataMatch, aposta.id, bet, multiplyBet, count)
@@ -82,15 +82,23 @@ class WebScrapingService {
                         for (let betCoupon of betsCoupon) {
                             const betFinish = await this.addAndFinishBet(betCoupon.match_id, betCoupon.opcao_id, bet, multiplyBet, count)
                             betsFinish.push(betFinish)
-                            betFinish.filter(asdsa => asdsad)
-                                .map(asdasdasdasd)
                             multiplyChild = Number(betFinish.bet.valorAposta) > 70 ? 2 : 1;
                         }
                     }
-
-                    const users = ReplyBets.getUsers()
-                    logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
-                    await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
+                    const users = [{
+                        login: 'nicolasrocha',
+                        password: 'Nicolas#123',
+                        value: 10,
+                    },
+                    {
+                        login: 'sabrinamello',
+                        password: 'Belinha22',
+                        value: 10
+                    }]
+                
+                    // const users = ReplyBets.getUsers()
+                    // logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
+                    worker(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
 
