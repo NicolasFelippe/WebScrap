@@ -1,6 +1,7 @@
 const { Worker, isMainThread } = require('worker_threads')
+const users = require('../../workers/users.json')
 
-const worker = (users, dataMatch, betId, multiplyChild) => {
+const worker = (dataMatch, betId, multiplyChild) => {
     const final = []
     let finishedWorkers = 0
     if (isMainThread) {

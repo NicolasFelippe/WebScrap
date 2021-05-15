@@ -85,18 +85,8 @@ class WebScrapingService {
                             multiplyChild = Number(betFinish.bet.valorAposta) > 70 ? 2 : 1;
                         }
                     }
-                    const users = [{
-                        login: 'nicolasrocha',
-                        password: 'Nicolas#123',
-                        value: 10,
-                    },
-                    {
-                        login: 'sabrinamello',
-                        password: 'Belinha22',
-                        value: 10
-                    }]
-                
-                    worker(users, dataMatch, aposta.id, multiplyChild);
+                  
+                    worker(dataMatch, aposta.id, multiplyChild);
                 }
             }
 
@@ -131,7 +121,6 @@ class WebScrapingService {
                 bet,
                 tentativas: count
             }
-            // sucesso - {"status":1,"codigo":"LOVRVNHZFR","credito":"5.464,49"}
 
         } catch (error) {
             logger(error)

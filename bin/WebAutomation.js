@@ -2,6 +2,7 @@ const dotenv = require('dotenv').config();
 const WebScrapingService = require('../api/services/web-scraping-father');
 const TelegramBot = require(`node-telegram-bot-api`);
 const { authenticate } = require('../api/services/eurobets-service')
+const { logger, JsonToString } = require('../api/util/utils')
 const schedule = require('node-schedule')
 class Main {
     #bets = [];
@@ -30,8 +31,7 @@ class Main {
         // telegramService.sendMessage(chatId, 'Received your message');
         // });
 
-        schedule.scheduleJob('*/2 * * * * *', async () => {
-
+        schedule.scheduleJob('*/10 * * * * *', async () => {
             let validatedBets, newBets = null;
 
             const headers = await authenticate(USER, PASS, COOKIE)
@@ -47,7 +47,7 @@ class Main {
             }
 
             if (Array.isArray(newBets) && newBets.length > 0) {
-
+                this.#bets.push(...validatedBets)
                 if (telegramService) {
                     const msg = JsonToString(newBets.map(bet => ({
                         'Partida': bet.match,
@@ -58,33 +58,23 @@ class Main {
                         'Odd': bet.odd
                     })))
                     telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${msg}`)
-                        .then((success) => console.log('mensagem enviada ao grupo'))
-                        .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
+                    // .then((success) => console.log('mensagem enviada ao grupo'))
+                    // .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
                     telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${msg}`)
-                        .then((success) => logger('mensagem enviada ao grupo de notificação'))
-                        .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
+                    //     .then((success) => logger('mensagem enviada ao grupo de notificação'))
+                    //     .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
                 }
 
                 const response = await webScraping.validationGames(newBets, MULTIPLYBET);
 
                 if (telegramService) {
                     telegramService.sendMessage(GROUP_ID_TELEGRAM, `SUCESSO REPLICADAS \n ${JsonToString(response)}`)
-                        .then((success) => logger('mensagem enviada ao grupo'))
-                        .catch((err) => logger('erro ao enviar mensagem para o grupo', JsonToString(err)));
+                    // .then((success) => logger('mensagem enviada ao grupo'))
+                    // .catch((err) => logger('erro ao enviar mensagem para o grupo', JsonToString(err)));
                 }
 
             }
-
-            if (Array.isArray(newBets) && newBets.length > 0) {
-                this.#bets.push(...newBets)
-            }
         })
-
-        // // função para ficar buscando a cada 1 minuto e enviar msg
-        // while (true) {
-
-        //     sleep(getRandomNumber(1, 3));
-        // }
     }
 }
 
