@@ -85,8 +85,8 @@ class WebScrapingService {
                             multiplyChild = Number(betFinish.bet.valorAposta) > 70 ? 2 : 1;
                         }
                     }
-                  
-                    worker(dataMatch, aposta.id, multiplyChild);
+                    
+                    // worker(dataMatch, aposta.id, multiplyChild);
                 }
             }
 
