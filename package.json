@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run teste",
-    "start": "node ./index.js",
-    "children": "node ../replyBets/index.js"
+    "start": "node ./index.js"
   },
   "repository": {
     "type": "git",

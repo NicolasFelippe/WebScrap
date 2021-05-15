@@ -1,6 +1,5 @@
 const { parentPort } = require('worker_threads')
 const { authenticate } = require('../api/services/eurobets-service')
-// const { logger } = require('../api/util/utils');
 const WebScrapingChildrenService = require('../api/services/web-scraping-children')
 
 

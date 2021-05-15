@@ -96,8 +96,6 @@ class WebScrapingService {
                         value: 10
                     }]
                 
-                    // const users = ReplyBets.getUsers()
-                    // logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
                     worker(users, dataMatch, aposta.id, multiplyChild);
                 }
             }

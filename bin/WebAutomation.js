@@ -1,11 +1,8 @@
 const dotenv = require('dotenv').config();
 const WebScrapingService = require('../api/services/web-scraping-father');
-// const TelegramBot = require(`node-telegram-bot-api`);
+const TelegramBot = require(`node-telegram-bot-api`);
 const { authenticate } = require('../api/services/eurobets-service')
-const { getRandomNumber, logger, sleep, JsonToString } = require('../api/util/utils');
 const schedule = require('node-schedule')
-// const work = require('../workers/index')
-const { Worker, isMainThread } = require('worker_threads')
 class Main {
     #bets = [];
 
@@ -21,9 +18,9 @@ class Main {
         let telegramService = null
 
         console.log(TELEGRAM)
-        // if (TELEGRAM) {
-        //     telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
-        // }
+        if (TELEGRAM) {
+            telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
+        }
 
         // FUNÇÃO USADA PARA DESCOBRIR O ID DO GRUPO TELEGRAM
         // telegramService.on('message', (msg) => {
@@ -33,9 +30,9 @@ class Main {
         // telegramService.sendMessage(chatId, 'Received your message');
         // });
 
-        schedule.scheduleJob('*/10 * * * * *', async () => {
-            let validatedBets, newBets = null;
+        schedule.scheduleJob('*/2 * * * * *', async () => {
 
+            let validatedBets, newBets = null;
 
             const headers = await authenticate(USER, PASS, COOKIE)
 
@@ -51,16 +48,7 @@ class Main {
 
             if (Array.isArray(newBets) && newBets.length > 0) {
 
-
-                const response = await webScraping.validationGames(newBets, MULTIPLYBET);
-
-
-
-
-
-
-
-               /*  if (telegramService) {
+                if (telegramService) {
                     const msg = JsonToString(newBets.map(bet => ({
                         'Partida': bet.match,
                         'Time Casa': bet.timeCasa,
@@ -77,13 +65,13 @@ class Main {
                         .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
                 }
 
-               
+                const response = await webScraping.validationGames(newBets, MULTIPLYBET);
 
                 if (telegramService) {
                     telegramService.sendMessage(GROUP_ID_TELEGRAM, `SUCESSO REPLICADAS \n ${JsonToString(response)}`)
                         .then((success) => logger('mensagem enviada ao grupo'))
                         .catch((err) => logger('erro ao enviar mensagem para o grupo', JsonToString(err)));
-                } */
+                }
 
             }
 
