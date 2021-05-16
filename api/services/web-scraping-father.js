@@ -86,7 +86,7 @@ class WebScrapingService {
                         }
                     }
                     
-                    // worker(dataMatch, aposta.id, multiplyChild);
+                    worker(dataMatch, aposta.id, multiplyChild);
                 }
             }
 
