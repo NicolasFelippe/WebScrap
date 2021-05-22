@@ -38,9 +38,7 @@ const login = (user, pass, envCookie) => {
 
     return axios(config)
         .then(({ headers }) => headers)
-        .catch((error) => {
-            throw `[ERROR] login ${JsonToString(error)}`
-        })
+        .catch(({ headers }) => headers)
 }
 
 const authenticate = async (user, password, cookie) => {
@@ -57,7 +55,6 @@ const authenticate = async (user, password, cookie) => {
             logger('[ERRO] [EuroBetsService] login()', `Tentativas: ${countAuth}`)
         }
         
-        if(countAuth > 4) return headers
         countAuth++
     }
     return headers

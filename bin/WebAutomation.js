@@ -40,9 +40,9 @@ class Main {
 
             const myBetsOpen = await webScraping.getScrapBets();
 
-            if (myBetsOpen.length > 0) validatedBets = webScraping.validateBets(myBetsOpen);
+            if (Array.isArray(myBetsOpen) && myBetsOpen.length > 0) validatedBets = webScraping.validateBets(myBetsOpen);
 
-            if (validatedBets && validatedBets.length > 0) {
+            if (Array.isArray(validatedBets) && validatedBets.length > 0) {
                 newBets = await webScraping.verifyNewBets(validatedBets, this.#bets);
             }
 

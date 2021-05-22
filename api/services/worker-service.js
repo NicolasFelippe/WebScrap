@@ -12,7 +12,7 @@ const worker = (dataMatch, betId, multiplyChild) => {
             worker.once('message', (response) => {
                 final.push(response)
                 finishedWorkers++
-                if (finishedWorkers === users.length) console.log(final)
+                if (finishedWorkers === users.length) console.log('final worker', final)
             })
             worker.on('error', console.error)
 
