@@ -86,7 +86,7 @@ class Main {
             if (Array.isArray(newBets)) {
                 this.#bets.push(...newBets)
             }
-            sleep(getRandomNumber(1, 3));
+            // sleep(getRandomNumber(1, 3));
         }
     }
 }

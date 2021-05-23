@@ -88,9 +88,9 @@ class WebScrapingService {
                         }
                     }
 
-                    const users = ReplyBets.getUsers()
-                    logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
-                    await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
+                    // const users = ReplyBets.getUsers()
+                    // logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
+                    // await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
 
