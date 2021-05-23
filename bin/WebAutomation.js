@@ -2,7 +2,8 @@ const dotenv = require('dotenv').config();
 const WebScrapingService = require('../api/services/WebScraping');
 // const TelegramBot = require(`node-telegram-bot-api`);
 const { login } = require('../api/services/eurobets-service')
-const { getRandomNumber, logger, sleep, JsonToString } = require('../api/util/utils');
+const { getRandomNumber, logger, JsonToString } = require('../api/util/utils');
+const delay = require('delay');
 
 class Main {
     #bets = [];
@@ -84,9 +85,11 @@ class Main {
             }
 
             if (Array.isArray(newBets)) {
-                this.#bets.push(...newBets)
+                this.#bets.push(...newBets);
             }
-            sleep(getRandomNumber(1, 3));
+            let time = getRandomNumber(1, 3);
+            console.log('await delay ', time)
+            await delay(time);
         }
     }
 }
