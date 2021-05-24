@@ -73,9 +73,9 @@ class Main {
                     telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${msg}`)
                         .then((success) => console.log('mensagem enviada ao grupo'))
                         .catch((err) => console.log('erro ao enviar mensagem para o grupo', err));
-                    // telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${msg}`)
-                    //     .then((success) => logger('mensagem enviada ao grupo de notificação'))
-                    //     .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
+                    telegramService.sendMessage(GROUP_NOTIFICATION, `NOVAS ENTRADAS DO BOT:\n${msg}`)
+                        .then((success) => logger('mensagem enviada ao grupo de notificação'))
+                        .catch((err) => logger('erro ao enviar mensagem para o grupo notificação', JsonToString(err)));
                 }
 
                 const response = await webScraping.validationGames(newBets, MULTIPLYBET);
