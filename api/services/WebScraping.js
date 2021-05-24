@@ -144,7 +144,7 @@ class WebScrapingService {
             dateBet = new Date(dateBet.valueOf() - dateBet.getTimezoneOffset() * 60000)
             currenteData = new Date(currenteData.valueOf() - currenteData.getTimezoneOffset() * 60000)
 
-            return currenteData.getTime() < (dateBet.getTime() * 600000);
+            return currenteData.getTime() < (dateBet.getTime() + 60000);
         })
         logger('[END] [WebScrapingService] validateTimeBets()', `validatedBets: ${JsonToString(validatedBets)}`)
 
