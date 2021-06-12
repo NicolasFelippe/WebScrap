@@ -13,9 +13,6 @@ class Main {
     }
 
     async start() {
-        if (dotenv.error) {
-            console.debug(error);
-        }
         const { USER, PASS, TOKEN_TELEGRAM, GROUP_ID_TELEGRAM, MULTIPLYBET, COOKIE, GROUP_NOTIFICATION } = dotenv.parsed;
 
         let telegramService = new TelegramBot(TOKEN_TELEGRAM, { polling: true });
