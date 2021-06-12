@@ -21,7 +21,7 @@ const getUsers = () => {
             value: 50
         },
         {
-            login: 'andrei muhlmann',
+            login: 'andrei/space/muhlmann',
             password: 'Am127@bet',
             value: 50
         }
@@ -32,6 +32,7 @@ const replyBets = async (users, idMatch, betId, multiplyChild) => {
     for (user of users) {
         logger('[INIT] [Reply Bets] replayBets()', `execucao cmd: ${user.login}, ${idMatch}, ${betId}, ${multiplyChild}, ${user.value}`)
         cmd.execute(`./processChildren.sh`, user.login, user.password, user.value * multiplyChild, idMatch, betId, '&')
+        cmd.execute(`./processChildren.sh`, 'andrei mulman', user.password, user.value * multiplyChild, idMatch, betId, '&')
     }
 }
 

@@ -12,9 +12,6 @@ class Main {
     }
 
     async start() {
-        if (dotenv.error) {
-            console.debug(error);
-        }
         const { USER, PASS, MULTIPLYBET, COOKIE } = dotenv.parsed;
 
         let validatedBets = null;
