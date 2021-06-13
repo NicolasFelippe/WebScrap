@@ -24,6 +24,11 @@ const getUsers = () => {
             login: 'andrei/space/muhlmann',
             password: 'Am127@bet',
             value: 50
+        },
+        {
+            login: 'adesoares',
+            password: '18121997dd',
+            value: 60
         }
     ];
 }
