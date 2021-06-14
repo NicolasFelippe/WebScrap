@@ -6,14 +6,14 @@ const { logger } = require('../util/utils')
 const getUsers = () => {
     return [
         {
-            login: 'markkinhos',
-            password: 'respeitaodeficiente',
-            value: 50
-        },
-        {
             login: 'sabrinamello',
             password: 'Belinha22',
             value: 100
+        },
+        {
+            login: 'markkinhos',
+            password: 'respeitaodeficiente',
+            value: 50
         },
         {
             login: 'SmashHero',
@@ -29,6 +29,11 @@ const getUsers = () => {
             login: 'adesoares',
             password: '18121997dd',
             value: 60
+        },
+        {
+            login: 'cristianocord',
+            password: 'xpt*747.',
+            value: 5
         }
     ];
 }
