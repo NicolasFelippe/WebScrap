@@ -39,6 +39,11 @@ const getUsers = () => {
             login: 'juansouza',
             password: 'neo@123',
             value: 2
+        },
+        {
+            login: 'jean.grahl',
+            password: 'Jean@123',
+            value: 5
         }
     ];
 }
