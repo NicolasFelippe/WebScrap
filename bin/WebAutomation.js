@@ -3,7 +3,6 @@ const WebScrapingService = require('../api/services/WebScraping');
 const { login } = require('../api/services/eurobets-service')
 const { getRandomNumber, logger, JsonToString } = require('../api/util/utils');
 const delay = require('delay');
-const adminService = require('./../api/services/admin-service')
 
 class Main {
     #bets = [];
@@ -14,13 +13,10 @@ class Main {
 
     async start() {
         const { USER, PASS, MULTIPLYBET, COOKIE } = dotenv.parsed;
-        const users = await adminService.getUsers()
-        console.log('users ', users)
-        logger('[get] [adminService] getUsers()', `user: ${USER}`)
         let validatedBets = null;
-        let auth = false
-        let headers = null
-        let countAuth = 1
+        let auth = false;
+        let headers = null;
+        let countAuth = 1;
         while (!auth) {
             logger('[INIT] [EuroBetsService] login()', `user: ${USER}`)
             headers = await login(USER, PASS, COOKIE);

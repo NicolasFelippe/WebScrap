@@ -3,6 +3,7 @@ const FormData = require('form-data');
 const { logger, JsonToString } = require('../util/utils');
 const { getSportBookByFutebol, getMyBets } = require('./scraping');
 const ReplyBets = require('./reply-bets.service');
+const adminService = require('./admin-service')
 class WebScrapingService {
     #headers
     constructor(headers) {
@@ -53,7 +54,7 @@ class WebScrapingService {
         }
     }
 
-    async validationGames(myBetsOpen, multiplyBet, users) {
+    async validationGames(myBetsOpen, multiplyBet) {
         logger('[INIT] [WebScrapingService] validationGames()', `myBetsOpen: ${JsonToString(myBetsOpen)}`)
         const betsFinish = []
         let multiplyChild;
@@ -89,6 +90,7 @@ class WebScrapingService {
                     }
 
                     logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
+                    const users = await adminService.getUsers()
                     await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
             }
