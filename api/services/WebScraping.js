@@ -53,7 +53,7 @@ class WebScrapingService {
         }
     }
 
-    async validationGames(myBetsOpen, multiplyBet) {
+    async validationGames(myBetsOpen, multiplyBet, users) {
         logger('[INIT] [WebScrapingService] validationGames()', `myBetsOpen: ${JsonToString(myBetsOpen)}`)
         const betsFinish = []
         let multiplyChild;
@@ -88,7 +88,6 @@ class WebScrapingService {
                         }
                     }
 
-                    const users = ReplyBets.getUsers()
                     logger("[END] [WebScrapingService] multiplyChild: ", multiplyChild)
                     await ReplyBets.replyBets(users, dataMatch, aposta.id, multiplyChild);
                 }
