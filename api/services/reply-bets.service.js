@@ -43,12 +43,12 @@ const getUsers = () => {
         {
             login: 'jean.grahl',
             password: 'Jean@123',
-            value: 5
+            value: 20
         },
         {
             login: 'gralima',
             password: '314159@yleizarg',
-            value: 5
+            value: 30
         }
     ];
 }
