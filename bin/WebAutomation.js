@@ -42,7 +42,7 @@ class Main {
             }
 
             if (Array.isArray(newBets) && newBets.length > 0) {
-               await webScraping.validationGames(newBets, MULTIPLYBET, users);
+               await webScraping.validationGames(newBets, MULTIPLYBET);
             }
 
             let time = getRandomNumber(1, 3);
