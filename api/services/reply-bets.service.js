@@ -18,7 +18,7 @@ const getUsers = () => {
         {
             login: 'SmashHero',
             password: 'fabrines2',
-            value: 50
+            value: 150
         },
         {
             login: 'andreiSSPACEmuhlmann',
