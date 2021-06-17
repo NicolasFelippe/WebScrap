@@ -8,4 +8,4 @@ const replyBets = async (users, idMatch, betId, multiplyChild) => {
     }
 }
 
-module.exports = { getUsers, replyBets }
+module.exports = { replyBets }
