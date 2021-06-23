@@ -4,7 +4,7 @@ const { JsonToString } = require('../util/utils')
 const getUsers = () => {
     const config = {
         method: 'get',
-        url: 'http://15.228.82.191:3003/api/bet-users',
+        url: 'http://15.228.82.191:3003/api/bet-users?isActive=true',
         withCredentials: true,
         headers: {
             'api-token':'371c1907-fb90-4ac8-814b-7580a2e82380'
