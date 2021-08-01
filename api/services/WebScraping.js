@@ -158,6 +158,8 @@ class WebScrapingService {
                 return bet.timeCasa === validatedBet.timeCasa
                     && bet.timeVisitante === validatedBet.timeVisitante
                     && bet.statusAposta === validatedBet.statusAposta
+                    && bet.time === validatedBet.time
+                    && bet.odd === validatedBet.odd
             });
         })
 
