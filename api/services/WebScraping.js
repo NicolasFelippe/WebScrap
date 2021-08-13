@@ -152,6 +152,7 @@ class WebScrapingService {
     }
 
     verifyNewBets(validatedBets, bets) {
+        logger('[INIT] [verifyNewBets]', `validatedBets: ${JsonToString(validatedBets)}, \n bets: ${JsonToString(bets)}`)
         const newBets = validatedBets.filter((validatedBet) => {
             return !bets.some((bet) => {
                 return bet.timeCasa === validatedBet.timeCasa
@@ -161,7 +162,7 @@ class WebScrapingService {
                     && bet.odd === validatedBet.odd
             });
         })
-
+        logger('[END] [verifyNewBets]', `newBets: ${JsonToString(newBets)}`)
         return newBets;
     }
 }
