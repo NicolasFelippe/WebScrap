@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 
 const getSportBookByFutebol = (headers) => {
     const options = {
-        uri: 'https://www.eurobets.uk/sportsbook/bet?esporte=futebol&data=2021-08-13',
+        uri: 'https://www.eurobetsplus.com/sportsbook/bet?esporte=futebol',
         headers: {
             cookie: headers['set-cookie']
         },
