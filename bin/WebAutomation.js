@@ -65,7 +65,8 @@ class Main {
                         'Time Visitante': bet.timeVisitante,
                         'Data Jogo': `${bet.dataJogo} - ${bet.horaJogo}`,
                         'Aposta': `${bet.statusAposta} - ${bet.time}`,
-                        'Odd': bet.odd
+                        'Odd': bet.odd,
+                        'Porcentagem': Number(bet.valorAposta) > 70 ? '2%' : '1%'
                     })))
                     telegramService.sendMessage(GROUP_ID_TELEGRAM, `Novas bets encontradas:\n${msg}`)
                         .then((success) => console.log('mensagem enviada ao grupo'))
